@@ -23,7 +23,7 @@
   <meta name="description" content="BM25(Best Match)BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量搜索词query和文档document相似度得分的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数 核心思想BM25算法的核心思想可以简介如下: 对">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一些关于BM25的重点">
-<meta property="og:url" content="https://ilingen.github.io/2022/02/26/%E4%B8%80%E4%BA%9B%E5%85%B3%E4%BA%8EBM25%E7%9A%84%E9%87%8D%E7%82%B9/index.html">
+<meta property="og:url" content="https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/index.html">
 <meta property="og:site_name" content="ilingen">
 <meta property="og:description" content="BM25(Best Match)BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量搜索词query和文档document相似度得分的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数 核心思想BM25算法的核心思想可以简介如下: 对">
 <meta property="og:locale" content="zh_CN">
@@ -35,7 +35,7 @@
 <meta property="article:tag" content="learning-to-rank">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://ilingen.github.io/2022/02/26/%E4%B8%80%E4%BA%9B%E5%85%B3%E4%BA%8EBM25%E7%9A%84%E9%87%8D%E7%82%B9/">
+<link rel="canonical" href="https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/">
 
 
 <script id="page-configurations">
@@ -309,7 +309,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/02/26/%E4%B8%80%E4%BA%9B%E5%85%B3%E4%BA%8EBM25%E7%9A%84%E9%87%8D%E7%82%B9/">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -352,8 +352,6 @@ mjx-container[display="true"] + br {
             </span>
 
           
-  
-  
 
         </div>
       </header>
@@ -513,10 +511,10 @@ BM25的一般公式<script type="math/tex; mode=display">Score(Q, d)= \sum_{i}^n
         <a href="mailto:liulingen429@gmail.com" title="E-Mail → mailto:liulingen429@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
-        <a href="http://www.zhihu.com/people/your-user-name" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;your-user-name" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+        <a href="http://www.zhihu.com/people/liu-lin-gen-77" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;liu-lin-gen-77" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
       </span>
       <span class="links-of-author-item">
-        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+        <a href="https://weibo.com/5247783364" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5247783364" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
       </span>
   </div>
 
@@ -707,35 +705,6 @@ BM25的一般公式<script type="math/tex; mode=display">Score(Q, d)= \sum_{i}^n
     
 
   
-
-
-<script>
-NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
-  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
-    var GUEST = ['nick', 'mail', 'link'];
-    var guest = 'nick,mail,link';
-    guest = guest.split(',').filter(item => {
-      return GUEST.includes(item);
-    });
-    new Valine({
-      el         : '#valine-comments',
-      verify     : false,
-      notify     : false,
-      appId      : 'ulGQCa2suncW22d5owUnK9Ar-gzGzoHsz',
-      appKey     : '09oPfjzm5R7eTxgjF6OFzjEW',
-      placeholder: "互相交流, 一起进步",
-      avatar     : 'mm',
-      meta       : guest,
-      pageSize   : '10' || 10,
-      visitor    : false,
-      lang       : '' || 'zh-cn',
-      path       : location.pathname,
-      recordIP   : false,
-      serverURLs : ''
-    });
-  }, window.Valine);
-});
-</script>
 
 </body>
 </html>
