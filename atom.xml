@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ilingen</title>
+  <icon>https://ilingen.github.io/icon.png</icon>
+  <subtitle>Still Waters Run Deep</subtitle>
+  <link href="https://ilingen.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://ilingen.github.io/"/>
+  <updated>2022-03-02T15:18:11.497Z</updated>
+  <id>https://ilingen.github.io/</id>
+  
+  <author>
+    <name>刘林根</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Sentence-BERT论文分享</title>
+    <link href="https://ilingen.github.io/2022/03/02/Sentence-BERT%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/"/>
+    <id>https://ilingen.github.io/2022/03/02/Sentence-BERT%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/</id>
+    <published>2022-03-02T09:32:33.000Z</published>
+    <updated>2022-03-02T15:18:11.497Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;最近在准备毕设，需要用到Sentence-BERT，所以找来论文进行了一次精读，下面主要为原文翻译和我的一些注释。&lt;/p&gt;
+&lt;p&gt;原论文链接&lt;a href=&quot;https://arxiv.org/abs/1908.10084&quot;&gt;在这&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;论文提供的代码&lt;a href=&quot;https://github.com/UKPLab/sentence-transformers&quot;&gt;在这&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="论文分享" scheme="https://ilingen.github.io/categories/%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/"/>
+    
+    
+    <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
+    
+    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
+    
+    <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>关于TF-IDF</title>
+    <link href="https://ilingen.github.io/2022/02/28/%E5%85%B3%E4%BA%8ETF-IDF/"/>
+    <id>https://ilingen.github.io/2022/02/28/%E5%85%B3%E4%BA%8ETF-IDF/</id>
+    <published>2022-02-27T16:44:53.000Z</published>
+    <updated>2022-02-27T16:53:03.099Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;TF-IDF&quot;&gt;&lt;a href=&quot;#TF-IDF&quot; class=&quot;headerlink&quot; title=&quot;TF-IDF&quot;&gt;&lt;/a&gt;TF-IDF&lt;/h1&gt;&lt;p&gt;TF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数&lt;/p&gt;
+&lt;p&gt;用于评估一个字词对于一个文件集或一个语料库中的其中一份文档的重要程度, 用作搜索信息检索, 文本挖掘和用户建模的加权因子.&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
+    
+    
+    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
+    <category term="TF-IDF" scheme="https://ilingen.github.io/tags/TF-IDF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>关于BM25</title>
+    <link href="https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/"/>
+    <id>https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/</id>
+    <published>2022-02-26T15:55:19.000Z</published>
+    <updated>2022-03-02T09:35:15.398Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;BM25-Best-Match&quot;&gt;&lt;a href=&quot;#BM25-Best-Match&quot; class=&quot;headerlink&quot; title=&quot;BM25(Best Match)&quot;&gt;&lt;/a&gt;BM25(Best Match)&lt;/h1&gt;&lt;p&gt;BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量&lt;strong&gt;搜索词query和文档document相似度得分&lt;/strong&gt;的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.&lt;br&gt;&lt;strong&gt;是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数&lt;/strong&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
+    
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="unsupervised learning" scheme="https://ilingen.github.io/tags/unsupervised-learning/"/>
+    
+    <category term="learning-to-rank" scheme="https://ilingen.github.io/tags/learning-to-rank/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hexo个人Blog搭建--基础</title>
+    <link href="https://ilingen.github.io/2022/02/16/Hexo%E4%B8%AA%E4%BA%BABlog%E6%90%AD%E5%BB%BA-%E5%9F%BA%E7%A1%80/"/>
+    <id>https://ilingen.github.io/2022/02/16/Hexo%E4%B8%AA%E4%BA%BABlog%E6%90%AD%E5%BB%BA-%E5%9F%BA%E7%A1%80/</id>
+    <published>2022-02-16T15:53:24.000Z</published>
+    <updated>2022-02-27T16:39:47.951Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;配置环境&quot;&gt;&lt;a href=&quot;#配置环境&quot; class=&quot;headerlink&quot; title=&quot;配置环境&quot;&gt;&lt;/a&gt;配置环境&lt;/h3&gt;&lt;p&gt;推荐使用linux系统&lt;/p&gt;
+&lt;p&gt;或者在win10操作系统上安装Git，使用Git Bash也可以&lt;/p&gt;
+&lt;p&gt;在这里我们使用Win10操作系统使用Git Bash来进行操作。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="博客站务" scheme="https://ilingen.github.io/categories/%E5%8D%9A%E5%AE%A2%E7%AB%99%E5%8A%A1/"/>
+    
+    
+    <category term="Hexo" scheme="https://ilingen.github.io/tags/Hexo/"/>
+    
+    <category term="Blog" scheme="https://ilingen.github.io/tags/Blog/"/>
+    
+  </entry>
+  
+</feed>
