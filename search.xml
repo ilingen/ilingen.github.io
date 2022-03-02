@@ -46,7 +46,7 @@
       </tags>
   </entry>
   <entry>
-    <title>一些关于BM25的重点</title>
+    <title>关于BM25</title>
     <url>/2022/02/26/%E5%85%B3%E4%BA%8EBM25/</url>
     <content><![CDATA[<h1 id="BM25-Best-Match"><a href="#BM25-Best-Match" class="headerlink" title="BM25(Best Match)"></a>BM25(Best Match)</h1><p>BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量<strong>搜索词query和文档document相似度得分</strong>的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.<br><strong>是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数</strong></p>
 <span id="more"></span>
@@ -86,6 +86,84 @@
       </tags>
   </entry>
   <entry>
+    <title>Sentence-BERT论文分享</title>
+    <url>/2022/03/02/Sentence-BERT%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/</url>
+    <content><![CDATA[<p>最近在准备毕设，需要用到Sentence-BERT，所以找来论文进行了一次精读，下面主要为原文翻译和我的一些注释。</p>
+<p>原论文链接<a href="https://arxiv.org/abs/1908.10084">在这</a></p>
+<p>论文提供的代码<a href="https://github.com/UKPLab/sentence-transformers">在这</a></p>
+<span id="more"></span>
+<h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>BERT和RoBERTa在语义文本相似性(semantic textual similarity, STS)等句子对(sentence-pair)回归任务上有SOTA的表现。然而，这需要两个句子都输入到网络中，这回造成巨大的计算开销。在10000个句子的集合中找到最相似的句子对需要使用BERT进行大约50000w词推理计算(65小时)。BERT的构造使得它不适合用于语义相似性搜索以及聚类等无监督任务。</p>
+<p>我们提出了Sentence-BERT（SBERT），这是对预训练的BERT网络的一种修改，它使用<strong>siamese和triplet(三重网络)结构来推导语义上有意义的句子嵌入，可以使用余弦相似性进行比较。这减少了寻找最相似配对的工作量，从使用BERT/RoBERTa的65小时减少到使用SBERT的约5秒，同时保持了使用BERT的准确性。</strong><br>我们评估了SBERT和SRoBERTa在常见STS任务和迁移学习任务中的表现，其表现优于其他最先进的句子嵌入方法。</p>
+<h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>Sentence-BERT时对BERT网络的一种修改，使用siamese和三元组网络(triplet networks)，能够导出语义上有意义的句子嵌入(sentence-embedding)。</p>
+<blockquote>
+<p> 这里的<strong>句子嵌入是指语义上相似的句子在向量空间相近。和word-embedding类似。</strong></p>
+</blockquote>
+<p>这使得SBERT能够用于某些新任务，这些任务到现在为止还不适用于BERT。包含<strong>大规模的语义相似性对比，聚类和通过语义搜索进行信息检索。</strong></p>
+<p>BERT在各种句子分类和句子对回归任务上取得了SOTA的表现。</p>
+<p><strong>BERT使用交叉编码器(cross-encoder)：将两句话传递transformer网络并且预测目标值。然而，由于可能的组合太多，这些设置不适合各种成对回归任务(various pair regression)。</strong></p>
+<blockquote>
+<p>BERT只接受两个句子的输入，而且每次需要经过BERT内部网络运算后才能得到相似度，所以对于大型任务，开销很大</p>
+</blockquote>
+<p>在n=10000的句子的集合中，找到最相似的句子需要BERT进行$n·(n-1)/2=49995000$次推理计算。需要大约65h，在modern V100 GPU上。</p>
+<p>研究聚类和语义搜索问题的一种常见方法是将每个句子映射到向量空间，这样语义相似的句子就很接近了。<strong>研究人员已经开始在BERT中输入单个句子，并衍生固定大小的句子嵌入。最常用的方法平均BERT输出层(BERT 嵌入)或使用第一个[CLS] token的输出。但是这种常见的作法会产生相当糟糕的句子嵌入，比[[GLoVe]]的嵌入更糟糕。</strong></p>
+<p>为了缓解这个问题，我们开发了SBERT, (siamese network)暹罗网络体系结构使输入句子的固定大小向量可以被导出。使用相似性度量，如余弦相似性或曼哈登/欧氏距离，可以找到语义相似的句子。这些相似性度量可以在现代硬件上非常高效地执行，从而允许SBERT用于语义相似性搜索以及聚类。<br>我们在NLI数据集上对SBERT进行微调，SBERT在STS任务上性能提升显著。</p>
+<h1 id="Related-Work"><a href="#Related-Work" class="headerlink" title="Related Work"></a>Related Work</h1><p>BERT是一个经过预训练的transformer网络，它为各种NLP任务设定了最新的SOTA结果，包括问答(question answering)、句子分类(sentence classification)和句子对回归(sentence-pair regression)。<br>用于句子对回归的BERT输入由两个句子组成，由一个特殊的[SEP]标记分隔。应用超过12层（基本模型）或24层（大模型）的多头注意力机制，并将输出传递到一个简单的回归函数，以导出最终标签。在STS任务上取得了SOTA的结构(Cer,2017)<br>RoBERTa表明，通过对训练前进行一些小的调整，可以进一步题高BERT的表现(Liu 2019)。</p>
+<p><strong>BERT网络结构的一个大缺点是没有计算独立的句子嵌入，这使得从BERT导出句子嵌入变得困难。</strong><br>为了绕过这个限制，研究人员通过BERT传递单个句子，然后通过平均输出(类似于平均单词嵌入)或使用特殊CLS标记的输出，得到一个固定大小的向量。(May,zhang,Qiao)<br>这两个选项也由bert-as-a-service-repository提供，但是据我们所知，目前还没有评估这些方法能否产生有用的句子嵌入。</p>
+<p>句子嵌入是一个被广泛研究的领域，提出了几十种方法。<br>Skip-Thought训练一种编码器-解码器架构来预测周围的句子。<br>InferSent使用SNLI斯坦福自然语言推理数据集合多类型NLI数据集的标记数据来训练孪生BiLSTM网络，在输出上进行最大池化。优于SkipThought等无监督方法。<br>Universal Sentence Encoder训练一个transformer的网络，并通过SNLI训练增强无监督学习。<br>Hill等人表明，句子嵌入训练的任务显著影响他们的质量。<br>之前的研究发现SNLI数据集适合训练句子嵌入。<br>Yang等人提出了一种使用孪生DAN和孪生transformer网络，从Reddit上进行对话训练，该方法在STS基准数据集上取得了良好的效果。<br>Humeau讨论了BERT的交叉编码器的运行是开销，并提出了一种方法(poly-encoders，多编码器)来计算m个上下文向量和预先计算的候选嵌入之间的分数。这个方法适合在更大的集合中找到得分更高的句子。然而，多编码器的缺点是得分函数不对称，并且计算开销对于聚类等用例来说太大，需要$O(n^2)$得分计算。</p>
+<p>以前的神经网络句子嵌入方法是从随机初始化开始训练的。<br>在本论文中，<strong>我们使用预先训练的BERT和RoBERTa网络，并仅对其做微调，以生成有用的句子嵌入</strong>，这大大减少了所需的训练时间。<br>SBERT可以在不到20分钟内调整，同时比类似的句子嵌入方法产生更好的效果。</p>
+<h1 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h1><p>SBERT在BERT/RoBERTa的输出中添加了一个池化操作，以导出固定大小的句子嵌入。我们实现了三种池化策略：<strong>使用CLS-token的输出，计算所有输出向量的平均值(MEAN-strategy)，计算输出向量随时间的最大值(MAX-strategy)。默认配置是MEAN。</strong></p>
+<p>为了优化BERT/RoBERTa，我们创建了孪生网络和三元组网络(schroff)，以更新权重，从而使生成的句子嵌入具有语义信息，并且可以通过余弦相似性进行比较。</p>
+<blockquote>
+<p>BERT产生的句向量不能通过余弦相似性比较，余弦相似性默认所有维度的权重是一样的，而BERT的语句嵌入在不同维度上的权重不同。</p>
+</blockquote>
+<p>我们在以下架构和目标函数进行实验。</p>
+<ul>
+<li><strong>Classification Objective Function</strong><br>我们把sentence embeddings u和v以及其元素差(element-wise difference)|u-v|进行连接，并将其与可训练的权重$W_t \in R^{3n \times k}$<script type="math/tex; mode=display">o=softmax(W_t(u, v, |u-v|)</script>n是sentence embedding的问题，k是标签的数量。<br>使用交叉熵作为优化。</li>
+<li><strong>Regression Objective Function</strong><br>计算sentence embeddings u和v的余弦相似性，我们使用均方误差损失作为目标函数。</li>
+<li><strong>Triplet Objective Function</strong><br>给定一个锚定句a，一个正样本p和一个负样本n，Triplet损失调整网络，使得a和p之间的距离小于a和n之间的距离。<br>最小化以下损失函数<script type="math/tex; mode=display">max(||s_a-s_p||-||s_a-s_n||+\epsilon, 0)</script>$s_x$是a,n,p的sentence embedding，|| · ||为距离度量和margin ε。<br>Margin ε确保$s_p$和$s_a$之间的距离要比$s_n$和$s_a$的距离至少近ε。<br>我们使用欧氏距离作为距离度量并且设置ε=1。<br><img src="https://s2.loli.net/2022/03/02/g45s1xCRrLQDIXn.png" alt=""><h2 id="Training-Details"><a href="#Training-Details" class="headerlink" title="Training Details"></a>Training Details</h2>我们在 <strong>SNLI (Bowman et al., 2015) 和 Multi-Genre NLI (Williams et al., 2018) 数据集的组合上训练 SBERT。</strong> SNLI 是 570,000 个句子对的集合，标注了矛盾、eintailment 和中性标签。 MultiNLI 包含 430,000 个句子对，涵盖了各种类型的口语和书面文本。 我们使用一个 epoch 的 3 路 softmaxclassifier 目标函数对 SBERT 进行微调。 我们使用了 16 的批量大小、学习率为 2e-5 的 Adam 优化器，以及超过 10% 的训练数据的线性学习率热身。 我们的默认池化策略是 MEAN。<h1 id="Evaluation-Semantic-Textual-Similarity"><a href="#Evaluation-Semantic-Textual-Similarity" class="headerlink" title="Evaluation-Semantic Textual Similarity"></a>Evaluation-Semantic Textual Similarity</h1></li>
+</ul>
+<p>我们评估 SBERT 在常见语义文本相似性 (STS) 任务中的性能。<strong>最先进的方法通常会学习一个（复杂的）回归函数，将sentence embedings映射到相似性分数。</strong> 然而，这些回归函数是work pair-wise的，并且由于组合爆炸，如果句子的集合达到一定的大小，这些回归函数通常是不可扩展的。 相反，<strong>我们总是使用余弦相似度来比较两个句子嵌入之间的相似度。 我们还使用负曼哈顿距离和负欧几里德距离作为相似性度量进行了实验，但所有方法的结果大致相同</strong>。</p>
+<blockquote>
+<p>作者提出的SBERT的语句嵌入可以通过余弦相似度进行比较，从而不需要一个回归函数将embeddings映射到分数上去。</p>
+</blockquote>
+<h2 id="Unsupervised-STS"><a href="#Unsupervised-STS" class="headerlink" title="Unsupervised STS"></a>Unsupervised STS</h2><p>我们在<strong>不使用任何 STS 特定训练数据的情况下直接评估 SBERT 对 STS 的性能</strong>。 我们使用 STS 任务 2012 - 2016（Agirre et al., 2012, 2013, 2014, 2015, 2016）、STS 基准（Cer et al., 2017）和 SICK-Relatedness 数据集（Marelli et al., 2014） ）。 这些数据集在句子对的语义相关性上提供了 0 到 5 之间的标签。 我们在 (Reimers et al., 2016) 中表明 Pearson 相关性非常适合 STS。 相反，我们计算句子嵌入的余弦相似度与gold标签之间的 Spearman 等级相关性。 其他句子嵌入方法的设置是等效的，相似度由余弦相似度计算。 结果如表 1 所示。<br><img src="https://s2.loli.net/2022/03/02/9PGDo86ihdYaEOq.png" alt=""><br>结果表明，直接使用BERT的输出会导致相当差的性能，平均BERT embedding嵌入实现的平均相关性仅为54.81，使用CLS  token输出为29.19的平均相关性，两者都比计算平均GloVe嵌入差。<br>使用所描述的孪生网络结构和微调机制显著改善了相关性，大大优于InferSent和通Universal Sentence Encoder。SBERT的表现比Universal Sentence Encoder差的唯一数据集是SICK-R。Universal Sentence Encoder在各种数据集上接受过培训，包括新闻、问答页面和论坛，这似乎更适合SICK-R的数据。相比之下，SBERT只在维基百科（通过BERT)和NLI数据上接受过预训练。<br>虽然RoBERTa能够提高多个监督任务的性能，当我们只观察到SBERT和SRoBERTa在生成句子嵌入方面的微小差异。</p>
+<h2 id="Supervised-STS"><a href="#Supervised-STS" class="headerlink" title="Supervised STS"></a>Supervised STS</h2><p>STS 基准 (STSb)（Cer 等人，2017 年）提供了一个流行的数据集，用于评估受监督的 STS 系统。数据包括来自标题、新闻和论坛三个类别的 8,628 个句子对。它分为训练（5,749）、开发（1,500）和测试（1,379）。 BERT 通过将两个句子传递到网络并使用简单的回归方法输出，在这个数据集上设置了一个新的最先进的性能。<br>我们<strong>使用训练集和回归目标函数对 SBERT 进行微调。在预测时，我们计算句子嵌入之间的余弦相似度</strong>。所有系统都使用 10 个随机种子进行训练以对抗差异（Reimers 和 Gurevych，2018 年）。<br>结果如表 2 所示。我们试验了两种设置：仅在 STSb 上训练；首先在 NLI 上训练，然后在 STSb 上训练。我们观察到后面的策略导致 1-2 点的轻微改善。这种两步法对BERT交叉编码器的影响特别大，性能提高了3-4个百分点。我们没有观察到 BERT 和 RoBERTa 之间的显著差异。<br><img src="https://s2.loli.net/2022/03/02/6Zb2kWGjYNu1DgQ.png" style="zoom:50%;" /></p>
+<h2 id="Argument-Facet-Similarity-AFS语料库"><a href="#Argument-Facet-Similarity-AFS语料库" class="headerlink" title="Argument Facet Similarity (AFS语料库)"></a>Argument Facet Similarity (AFS语料库)</h2><p>我们在 Misra 等人的 Argument Facet Similarity (AFS) 语料库上评估 SBERT。 (2016)。 AFS 语料库注释了来自社交媒体对话的 6,000 个句子论据对，涉及三个有争议的话题：枪支管制、同性婚姻和死刑。数据的注释范围从 0（“不同主题”）到 5（“完全等效”）。 AFS 语料库中的相似性概念与来自 SemEval 的 STS 数据集中的相似性概念完全不同。 <strong>STS 数据通常是描述性的，而 AFS 数据是来自对话的争论性摘录。要被认为是相似的，论证不仅必须提出相似的主张，而且还必须提供相似的推理。</strong>此外，AFS 中句子之间的词汇差距要大得多。因此，简单的无监督方法以及最先进的 STS 系统在该数据集上表现不佳（Reimers 等，2019）。  </p>
+<p>我们在两种情况下在此数据集上评估 SBERT：1) 正如 Misra 等人提出的那样，我们使用 10 折交叉验证评估 SBERT。这种评估设置的一个缺点是不清楚方法对不同主题的泛化程度。因此，2）我们在跨主题设置中评估 SBERT。两个主题用于训练，该方法在被遗漏的主题上进行评估。我们对所有三个主题重复此操作并平均结果。</p>
+<p>SBERT 使用回归目标函数进行了微调。相似度分数是基于句子嵌入使用余弦相似度计算的。我们还提供了 Pearson 相关性 r 以使结果与 Misra 等人的结果相当。然而，我们表明（Reimers 等人，2016 年）Pearson 相关有一些严重的缺点，在比较 STS 系统时应该避免。结果如表 3 所示。<br><img src="https://s2.loli.net/2022/03/02/1E8ezr2Jt3N4IkY.png" style="zoom:50%;" /><br>tf-idf、平均 GloVe 嵌入或 InferSent 等无监督方法在此数据集上的表现相当糟糕，得分较低。在 10 折交叉验证设置中训练 SBERT 的性能几乎与 BERT 相当。</p>
+<p>然而，在跨主题评估中，我们观察到 SBERT 的性能下降了大约 7 个点的 Spearman 相关性。要被视为相似，论点应针对相同的主张并提供相同的推理。 <strong>BERT 能够使用注意力直接比较两个句子（例如逐字比较），而 SBERT 必须将单个句子从一个看不见的主题映射到一个向量空间，以便具有相似主张和原因的论点接近。这是一项更具挑战性的任务，它似乎需要不止两个主题来训练才能与 BERT 相提并论。</strong></p>
+<h2 id="Wikipedia-Sections-Distinction"><a href="#Wikipedia-Sections-Distinction" class="headerlink" title="Wikipedia Sections Distinction"></a>Wikipedia Sections Distinction</h2><p>多尔等人 (2018) 使用维基百科为句子嵌入方法创建了一个主题细粒度的训练、开发和测试集。维基百科文章被分成不同的部分，侧重于某些方面。多尔等人假设同一部分中的句子在主题上比不同部分中的句子更接近。他们使用它来创建一个包含弱标记句子三元组的大型数据集：锚点和正例来自同一部分，而反例来自同一文章的不同部分。比如来自 Alice Arnold 的文章：Anchor：Arnold 于 1988 年加入 BBC Radio Drama 公司，正面：Arnold 于 2012 年 5 月获得媒体关注，负面：Balding 和 Arnold 都是狂热的业余高尔夫球手。<br>我们使用 Dor 等人的数据集。我们使用三元组目标，在大约 180 万个训练三元组上训练 SBERT 一个epoch，并在 222,957 个测试三元组上对其进行评估。测试三元组来自一组不同的维基百科文章。作为评估指标，<strong>我们使用准确性：正例是否比负例更接近锚点？</strong>结果如表 4 所示。<br><img src="https://s2.loli.net/2022/03/02/CwYXkEKrP8D4Ni1.png" style="zoom:50%;" /><br>多尔等人使用三元组损失对 BiLSTM 架构进行了微调，以获得该数据集的句子嵌入。如表所示，SBERT 明显优于多尔等人的 BiLSTM 方法。</p>
+<h1 id="Evaluation-SentEval"><a href="#Evaluation-SentEval" class="headerlink" title="Evaluation-SentEval"></a>Evaluation-SentEval</h1><p>SentEval (Conneau and Kiela, 2018) 是一种流行的工具包，用于评估句子嵌入的质量。 句子嵌入用作逻辑回归分类器的特征。 逻辑回归分类器在 10 折交叉验证设置中针对各种任务进行训练，并为测试折计算预测精度。<br><strong>SBERT 句子嵌入的目的不是用于其他任务的迁移学习。</strong>在这里，我们认为按照 Devlin 等人的描述对 BERT 进行微调。 （2018）对于新任务是更合适的方法，因为它更新了 BERT 网络的所有层。然而，SentEval 仍然可以给我们在各种任务中的句子嵌入的质量留下印象。<br>我们在以下七个 SentEval 传输任务中将 SBERT 句子嵌入与其他句子嵌入方法进行了比较：<br>• MR：电影评论片段的情感预测，从五个开始（Pang 和 Lee，2005 年）。 • CR：客户产品评论的情绪预测（Hu and Liu，2004）。 • SUBJ：来自电影评论和情节摘要的句子的主观预测（Pang 和 Lee，2004 年）。 • MPQA：来自新闻专线的短语级别意见极性分类（Wiebe 等，2005）。 • SST：带有二元标签的斯坦福情绪树库（Socher 等人，2013 年）。 • TREC：来自TREC 的细粒度问题类型分类（Li 和Roth，2002 年）。 • MRPC：来自平行新闻来源的微软研究释义语料库（Dolan 等，2004）。<br><img src="https://s2.loli.net/2022/03/02/pkoXxtwjsfAR1rU.png" alt=""><br>结果见表 5。SBERT 能够在 7 个任务中的 5 个任务中取得最佳性能。与 InferSent 和 Universal Sentence Encoder 相比，平均性能提高了大约 2 个百分点。尽管迁移学习不是 SBERT 的目的，但它在此任务上优于其他最先进的句子嵌入方法。</p>
+<p>SBERT 的句子嵌入似乎很好地捕获了情感信息：与 InferSent 和 Universal Sentence Encoder 相比，我们观察到 SentEval 的所有情感任务（MR、CR 和 SST）都有很大的改进。<br>SBERT 明显比通用句子编码器差的唯一数据集是 TREC 数据集。 Universal Sentence Encoder 在问答数据上进行了预训练，这似乎有利于 TREC 数据集的问题类型分类任务。<br>平均 BERT 嵌入或使用来自 BERT 网络的 CLStoken 输出在各种 STS 任务中取得了糟糕的结果（表 1），比平均 GloVe 嵌入差。然而，对于 SentEval，平均 BERT 嵌入和 BERT CLS token输出取得了不错的结果（表 5），优于平均 GloVe 嵌入。原因是不同的设置。<strong>对于 STS 任务，我们使用余弦相似度来估计句子嵌入之间的相似度。余弦相似性平等对待所有维度。相比之下，SentEval 将逻辑回归分类器拟合到句子嵌入中。这允许某些维度对分类结果具有更高或更低的影响。</strong><br>我们得出的结论是，<strong>来自 BERT 的平均 BERT 嵌入/CLS-token 输出返回的句子嵌入不能与余弦相似度或曼哈顿/欧几里得距离一起使用。</strong><br>对于迁移学习，它们产生的结果比 InferSent 或 Universal Sentence Encoder 稍差。然而，在 NLI 数据集上使用具有 siamese 网络结构的所述微调设置产生句子嵌入，实现了 SentEval 工具包的最新技术水平。</p>
+<h1 id="Ablation-Study"><a href="#Ablation-Study" class="headerlink" title="Ablation Study"></a>Ablation Study</h1><p>我们已经证明了 SBERT 句子嵌入质量。 在本节中，我们对 SBERT 的不同方面进行了消融研究，以便更好地了解它们的相对重要性。</p>
+<p><strong>我们评估了不同的池化策略（MEAN、MAX 和 CLS）。 对于分类目标函数，我们评估不同的连接方法。</strong> 对于每种可能的配置，我们用 10 个不同的随机种子训练 SBERT 并平均性能。</p>
+<p>目标函数（分类与回归）取决于带注释的数据集。 对于分类目标函数，我们在 SNLI 和 Multi-NLI 数据集上训练 SBERTbase。 对于回归目标函数，我们在 STS 基准数据集的训练集上进行训练。 性能是根据 STS 基准数据集的开发拆分来衡量的。 结果如表 6 所示。<br><img src="https://s2.loli.net/2022/03/02/6MTHlbmqCdeRQyK.png" style="zoom:50%;" /><br>在 NLI 数据上使用分类目标函数进行训练时，池化策略的影响相当小。连接模式的影响要大得多。 InferSent (Conneau et al., 2017) 和 Universal Sentence Encoder (Cer et al., 2018) 都使用 (u, v, |u − v|, u ∗ v) 作为 softmax 分类器的输入。然而，在我们的架构中，添加元素 u ∗ v 会降低性能。</p>
+<p><strong>最重要的部分是元素差异|u - v|。请注意，连接模式仅与训练 softmax 分类器相关。在推理时，在预测 STS 基准数据集的相似性时，只有句子嵌入 u 和 v 与余弦相似性结合使用。元素差异测量两个句子嵌入维度之间的距离，确保相似对更近，不同对更远。</strong></p>
+<p>当用回归目标函数训练时，我们观察到池化策略有很大的影响。在那里，MAX 策略的表现明显比 MEAN 或 CLS 令牌策略差。这与 (Conneau et al., 2017) 形成对比，后者发现 InferSent 的 BiLSTM 层使用 MAX 而不是 MEAN 池化是有益的。</p>
+<h1 id="Computational-Efficiency"><a href="#Computational-Efficiency" class="headerlink" title="Computational Efficiency"></a>Computational Efficiency</h1><p>句子嵌入可能需要计算数百万个句子，因此需要高计算速度。在本节中，我们将 SBERT 与平均 GloVe 嵌入、InferSent（Conneau 等人，2017 年）和 Universal Sentence Encoder（Cer 等人，2018 年）进行比较。</p>
+<p>为了进行比较，我们使用 STS 基准测试中的句子（Cer 等人，2017 年）。我们使用带有 Python 字典查找和 NumPy 的简单 for 循环来计算平均 GloVe 嵌入。 InferSent4 基于 PyTorch。对于通用句子编码器，我们使用基于 TensorFlow 的 TensorFlow Hub version5。 SBERT 基于 PyTorch。为了改进句子嵌入的计算，我们实施了一种智能批处理策略：将长度相似的句子组合在一起，并仅填充到小批量中最长的元素。这大大减少了填充令牌的计算开销。</p>
+<p>性能是在配备 Intel i7-5820K CPU @ 3.30GHz、Nvidia Tesla V100 GPU、CUDA 9.2 和 cuDNN 的服务器上测量的。结果如表 7 所示。<br><img src="https://s2.loli.net/2022/03/02/dC9VXthcNMZiu2q.png" alt=""><br>在 CPU 上，InferSent 比 SBERT 快 65%。 这是由于更简单的网络架构。 InferSent 使用单个 BiLSTM 层，而 BERT 使用 12 个堆叠的 Transformer 层。 然而，transformer 网络的一个优势是 GPU 上的计算效率。 在那里，具有智能批处理的 SBERT 比 InferSent 快约 9%，比 Universal Sentence Encoder 快约 55%。 智能批处理在 CPU 上实现了 89% 的加速，在 GPU 上实现了 48% 的加速。 平均手套嵌入显然是计算句子嵌入的最快方法。</p>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>我们展示了 BERT 开箱即用地将句子映射到一个向量空间，该空间非常不适合与常见的相似性度量（如余弦相似性）一起使用。七个 STS 任务的性能低于平均 GloVe 嵌入的性能。</p>
+<p>为了克服这个缺点，我们提出了 Sentence-BERT (SBERT)。 SBERT 在 siamese/triplet 网络架构中对 BERT 进行微调。我们评估了各种常见基准的质量，在那里它可以实现对最先进的句子嵌入方法的显著改进。在我们的实验中，用 RoBERTa 替换 BERT 并没有产生显著的改进。</p>
+<p>SBERT 在计算上是高效的。在 GPU 上，它比 InferSent 快约 9%，比 Universal Sentence Encoder 快约 55%。 SBERT 可用于在计算上无法用 BERT 建模的任务。例如，使用层次聚类对 10,000 个句子进行聚类需要 BERT 大约 65 小时，因为必须计算大约 5000 万个句子组合。使用 SBERT，我们能够将工作时间减少到大约 5 秒。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在语义相似度(STS)计算任务上，由于BERT模型规定，在计算相似度时，需要将两个句子同时进入模型，进行信息交互，这会造成大量的计算开销。</p>
+<p>在实际应用中，比如FAQ检索，如果每一次用户查询过来，都需要和所有FAQ问答对进行比对，那么需要花费很久的时间。</p>
+<p>作者提出的SBERT利用孪生网络模型的框架，将不同的句子输入到两个BERT模型中(但是这两个BERT模型是参数共享的，也可以理解为同一个BERT模型)，获取到每个句子的句子表征向量，最终获得的句子表征向量，可以用于语义相似度计算，也可以用于无监督的聚类任务。</p>
+<p>对于求句子向量的策略，作者定义了三种：CLS token的输出向量，平均池化和最大值池化。</p>
+<p>CLS token向量：将BERT模型中输出的CLS向量作为整句话的句向量<br>平均池化向量：将句子通过BERT模型得到的所有的字向量进行求均值操作，最终将均值向量作为整句话的句向量。<br>最大值池化向量：将句子通过BERT模型得到的所有字向量进行求最大值操作，最终将最大值向量作为整句话的句向量。</p>
+<p>最后得到的结论是：平均池化策略最好，虽然效果没有BERT 直接输入两句话好，但是速度很快，而且比其他方法好，对于工业界很有价值。</p>
+]]></content>
+      <categories>
+        <category>论文分享</category>
+      </categories>
+      <tags>
+        <tag>BERT</tag>
+        <tag>NLP</tag>
+        <tag>SBERT</tag>
+        <tag>STS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>关于TF-IDF</title>
     <url>/2022/02/28/%E5%85%B3%E4%BA%8ETF-IDF/</url>
     <content><![CDATA[<h1 id="TF-IDF"><a href="#TF-IDF" class="headerlink" title="TF-IDF"></a>TF-IDF</h1><p>TF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数</p>
@@ -122,8 +200,8 @@
       </categories>
       <tags>
         <tag>IR</tag>
-        <tag>ML</tag>
         <tag>NLP</tag>
+        <tag>ML</tag>
         <tag>TF-IDF</tag>
       </tags>
   </entry>
