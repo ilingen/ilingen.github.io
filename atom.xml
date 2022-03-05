@@ -6,15 +6,46 @@
   <link href="https://ilingen.github.io/atom.xml" rel="self"/>
   
   <link href="https://ilingen.github.io/"/>
-  <updated>2022-03-02T15:18:11.497Z</updated>
+  <updated>2022-03-05T15:16:28.426Z</updated>
   <id>https://ilingen.github.io/</id>
   
   <author>
-    <name>刘林根</name>
+    <name>ilingen</name>
     
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>关于语言模型(LM)</title>
+    <link href="https://ilingen.github.io/2022/03/03/%E5%85%B3%E4%BA%8E%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B-LM/"/>
+    <id>https://ilingen.github.io/2022/03/03/%E5%85%B3%E4%BA%8E%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B-LM/</id>
+    <published>2022-03-03T09:10:47.000Z</published>
+    <updated>2022-03-05T15:16:28.426Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;在NLP的很多引用中，我们都需要判断一个句子是否合理，比如机器翻译中，需要判断翻译的话是否合理；拼写检查中，正确的词在语句中出现的概率要比错误的词出现的概率更高；在语音识别中，对于同音词的处理。&lt;/p&gt;
+&lt;p&gt;最初的语言模型是基于语法规则手工编织的，后来被统计语言模型取代。&lt;/p&gt;
+&lt;p&gt;在机器学习中，对上述需求的做法是计算概率，当一个句子出现的概率较大时，我们可以判断该句更为合理，更容易出现。根据大数定理，当样本量足够大时，概率可以由频率来进行估计，所以我们可以统计频率，再以此估计概率。&lt;/p&gt;
+&lt;p&gt;后续随着神经网络的发展，提出了神经网络语言模型，核心思想是神经网络的强大的拟合能力，直接拟合出语言模型的概率分布。&lt;/p&gt;
+&lt;p&gt;在本博客中，主要重点介绍统计语言模型和简单的神经网络语言模型(NNLM)。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
+    
+    
+    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="Language Model" scheme="https://ilingen.github.io/tags/Language-Model/"/>
+    
+  </entry>
   
   <entry>
     <title>Sentence-BERT论文分享</title>
@@ -74,7 +105,7 @@
     <link href="https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/"/>
     <id>https://ilingen.github.io/2022/02/26/%E5%85%B3%E4%BA%8EBM25/</id>
     <published>2022-02-26T15:55:19.000Z</published>
-    <updated>2022-03-02T09:35:15.398Z</updated>
+    <updated>2022-03-04T09:24:02.374Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;BM25-Best-Match&quot;&gt;&lt;a href=&quot;#BM25-Best-Match&quot; class=&quot;headerlink&quot; title=&quot;BM25(Best Match)&quot;&gt;&lt;/a&gt;BM25(Best Match)&lt;/h1&gt;&lt;p&gt;BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量&lt;strong&gt;搜索词query和文档document相似度得分&lt;/strong&gt;的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.&lt;br&gt;&lt;strong&gt;是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数&lt;/strong&gt;&lt;/p&gt;</summary>
