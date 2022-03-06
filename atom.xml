@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>ilingen</title>
   <icon>https://ilingen.github.io/icon.png</icon>
-  <subtitle>Still Waters Run Deep</subtitle>
+  <subtitle>曾许人间第一流</subtitle>
   <link href="https://ilingen.github.io/atom.xml" rel="self"/>
   
   <link href="https://ilingen.github.io/"/>
-  <updated>2022-03-05T15:16:28.426Z</updated>
+  <updated>2022-03-06T13:12:03.696Z</updated>
   <id>https://ilingen.github.io/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>记录一次Pytorch安装踩坑记录</title>
+    <link href="https://ilingen.github.io/2022/03/06/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1Pytorch%E5%AE%89%E8%A3%85%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
+    <id>https://ilingen.github.io/2022/03/06/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1Pytorch%E5%AE%89%E8%A3%85%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</id>
+    <published>2022-03-06T12:36:23.000Z</published>
+    <updated>2022-03-06T13:12:03.696Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;今天下午在看SBERT的toturial的时候，想写一下SBERT在STS数据集的微调。&lt;/p&gt;
+&lt;p&gt;然后导入torch的时候傻眼了，显示&lt;strong&gt;torch.cuda.is_available()&lt;/strong&gt;为False。&lt;/p&gt;
+&lt;p&gt;嗯~ o(&lt;em&gt;￣▽￣&lt;/em&gt;)o？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
+    
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
+    
+  </entry>
   
   <entry>
     <title>关于语言模型(LM)</title>
@@ -35,11 +58,11 @@
     <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
     
     
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
     <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
     
     <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
-    
-    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
     
     <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
     
@@ -64,9 +87,9 @@
     <category term="论文分享" scheme="https://ilingen.github.io/categories/%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
-    
     <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
     
     <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
     
@@ -90,11 +113,11 @@
     <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
     
     
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
     <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
     
     <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
-    
-    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
     
     <category term="TF-IDF" scheme="https://ilingen.github.io/tags/TF-IDF/"/>
     
