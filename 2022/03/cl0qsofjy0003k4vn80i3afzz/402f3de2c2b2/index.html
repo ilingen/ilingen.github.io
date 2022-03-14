@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilingen.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="毕设和FAQ检索有关，需要用到SBERT，所以查看了一下SBERT的论文和文档写了一下SBERT和BERT的图示。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SBERT的训练图示">
+<meta property="og:url" content="https://ilingen.github.io/2022/03/cl0qsofjy0003k4vn80i3afzz/402f3de2c2b2/index.html">
+<meta property="og:site_name" content="ilingen">
+<meta property="og:description" content="毕设和FAQ检索有关，需要用到SBERT，所以查看了一下SBERT的论文和文档写了一下SBERT和BERT的图示。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/7Kg3hM9oY2zJPCI.jpg">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/gO3SEWHPZKG8is2.png">
+<meta property="og:image" content="https://s2.loli.net/2022/03/02/g45s1xCRrLQDIXn.png">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/2ELdcPixDg5hszV.png">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/CNY9EWfVh6eDyRJ.png">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/GzXCUdufN3mE9rQ.png">
+<meta property="article:published_time" content="2022-03-14T08:21:36.000Z">
+<meta property="article:modified_time" content="2022-03-14T13:43:27.051Z">
+<meta property="article:author" content="ilingen">
+<meta property="article:tag" content="IR">
+<meta property="article:tag" content="DL">
+<meta property="article:tag" content="BERT">
+<meta property="article:tag" content="SBERT">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/03/14/7Kg3hM9oY2zJPCI.jpg">
+
+<link rel="canonical" href="https://ilingen.github.io/2022/03/cl0qsofjy0003k4vn80i3afzz/402f3de2c2b2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SBERT的训练图示 | ilingen</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="ilingen" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ilingen</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">曾许人间第一流</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/03/cl0qsofjy0003k4vn80i3afzz/402f3de2c2b2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="ilingen">
+      <meta itemprop="description" content="A Rookie'blog in NLP&IR">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ilingen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SBERT的训练图示
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-14 16:21:36 / 修改时间：21:43:27" itemprop="dateCreated datePublished" datetime="2022-03-14T16:21:36+08:00">2022-03-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" itemprop="url" rel="index"><span itemprop="name">工具使用</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>毕设和FAQ检索有关，需要用到SBERT，所以查看了一下SBERT的论文和文档写了一下SBERT和BERT的图示。</p>
+<span id="more"></span>
+<h1 id="BERT介绍"><a href="#BERT介绍" class="headerlink" title="BERT介绍"></a>BERT介绍</h1><p>BERT是在层级transformer架构上得到的大规模预训练语言模型，BERT在预训练的时候采用的是NSP和MLM两种任务。</p>
+<p><img src="https://s2.loli.net/2022/03/14/7Kg3hM9oY2zJPCI.jpg" alt=""></p>
+<p>BERT的输入和输出都是词的embedding向量，输出的CLS向量可以用作分类和相似度的任务。</p>
+<p>对于句子嵌入，BERT将CLS向量作为sentence embedding。</p>
+<p>考虑对于句子<strong>Paris is a beautiful city.</strong></p>
+<p>在经过BERT处理后输入句子为<strong>[CLS] Paris is a beautiful city [SEP]</strong></p>
+<p><img src="https://s2.loli.net/2022/03/14/gO3SEWHPZKG8is2.png" style="zoom: 50%;"></p>
+<p>得到的句子嵌入为</p>
+<script type="math/tex; mode=display">Sentence\ Embedding=R_{[CLS]}</script><p>但是直接通过CLS的向量作为句子表示是不好的，已经有相关研究证明了，这一点也在SBERT论文里提到。所以后来就有人想到了利用所有的token向量表示句子—这就是池化策略。</p>
+<p>对于池化策略，可以分为平均池化和最大池化。</p>
+<p>平均池化就是对所有的token向量取平均。</p>
+<p>最大池化就是对所有的句向量进行求最大值操作，最后的最大值向量作为整句话的句向量。</p>
+<h1 id="SBERT的结构"><a href="#SBERT的结构" class="headerlink" title="SBERT的结构"></a>SBERT的结构</h1><p>SBERT是在BERT的基础上改来的，并没有改变BERT的内部结构，而是在外部采用孪生(Siamese)和三级(Triplet)网络结构来获得定长的sentence embedding。采用SBERT得到的sentence embedding可以通过余弦相似度或者Manhatten/Euclidean距离进行比较来找到语义相关的句子。</p>
+<p><img src="https://s2.loli.net/2022/03/02/g45s1xCRrLQDIXn.png" alt=""></p>
+<h2 id="SBERT用于STS任务"><a href="#SBERT用于STS任务" class="headerlink" title="SBERT用于STS任务"></a>SBERT用于STS任务</h2><p>STS任务包含句子对以及二分类标签，用标签显示这两个句子是相似还是不相似。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">I completed my assignment I completed my homework 1</span><br><span class="line">The game was boring This is a great place 0</span><br></pre></td></tr></table></figure>
+<p>以第一条数据为例，看一下SBERT利用孪生网络的流程。</p>
+<p>孪生网络就是两个共享权重的相同的网络</p>
+<p>对句子进行编码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Token1=[[CLS] i completed my assignment [SEP]]</span><br><span class="line">Token2=[[CLS] i completed my homework [SEP]]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>然后分别把这些tokens喂给BERT，获得每个句子的向量表示u, v。</p>
+<p>在SBERT的论文里，提到了平均池化的策略效果最好，所以我们也选择平均池化。</p>
+<p><img src="https://s2.loli.net/2022/03/14/2ELdcPixDg5hszV.png" style="zoom:50%;"></p>
+<p>输出为Softmax的输出，为相似概率。</p>
+<script type="math/tex; mode=display">Softmax(W_t(u,v,|u-v|))</script><p>通过最小化<strong>交叉熵</strong>损失来训练上面的网络，同时更新权重W。</p>
+<h2 id="SBERT用于句子对回归任务"><a href="#SBERT用于句子对回归任务" class="headerlink" title="SBERT用于句子对回归任务"></a>SBERT用于句子对回归任务</h2><p>句子对回归任务和上文的STS任务相似，但是句子对回归任务的目标是相似度Score。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sentence 1		sentence 2		  score</span><br><span class="line">How old are you. What is your age 0.99</span><br><span class="line">The food is tasty. The food is delicious 0.98</span><br></pre></td></tr></table></figure>
+<p>预处理和STS的任务是一样的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Tokens 1: [[CLS] how old are you [SEP]]</span><br><span class="line">Tokens 2: [[CLS] what is your age [SEP]]</span><br></pre></td></tr></table></figure>
+<p>然后输入孪生网络BERT中，获得每个标记的向量表示u，v。</p>
+<p>使用余弦相似度作为计算工具。</p>
+<script type="math/tex; mode=display">Similarity=cos(u, v)</script><p><img src="https://s2.loli.net/2022/03/14/CNY9EWfVh6eDyRJ.png" alt=""></p>
+<p>通过最小化<strong>均方误差损失</strong>来训练网络。</p>
+<h2 id="带有triplet的SBERT"><a href="#带有triplet的SBERT" class="headerlink" title="带有triplet的SBERT"></a>带有triplet的SBERT</h2><p>训练数据样式为一个Anchor锚，一个positive和一个negative</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Anchor: play the game</span><br><span class="line">Positive: He is playing the game</span><br><span class="line">Negative: Don't play the game</span><br></pre></td></tr></table></figure>
+<p>我们的任务是让Anchor句子与正样本句子之间的相似度很高，Anchor句子和负样本句子之间的相似度很低。此时SBERT使用三重态网络架构。</p>
+<p>使用<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.65ex" xmlns="http://www.w3.org/2000/svg" width="8.37ex" height="1.65ex" role="img" focusable="false" viewBox="0 -442 3699.3 729.2"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mi" transform="translate(502,-150) scale(0.707)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g></g><g data-mml-node="mo" transform="translate(926.1,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="msub" transform="translate(1370.7,0)"><g data-mml-node="mi"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mi" transform="translate(502,-150) scale(0.707)"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g><g data-mml-node="mo" transform="translate(2278.4,0)"><path data-c="2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path></g><g data-mml-node="msub" transform="translate(2723.1,0)"><g data-mml-node="mi"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mi" transform="translate(502,-150) scale(0.707)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g></svg></mjx-container>表示anchor，positive和negative句子的句向量。最小化损失函数为三重态目标函数。</p>
+<p><img src="https://s2.loli.net/2022/03/14/GzXCUdufN3mE9rQ.png" alt=""></p>
+<script type="math/tex; mode=display">max(||s_a-s_p||-||s_a-s_n||+ \epsilon, 0)</script><p>||·||表示距离指标，使用欧氏距离。ε表示间隔margin，用于保证正样本句向量<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.65ex" xmlns="http://www.w3.org/2000/svg" width="2.054ex" height="1.65ex" role="img" focusable="false" viewBox="0 -442 907.7 729.2"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D460" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path></g><g data-mml-node="mi" transform="translate(502,-150) scale(0.707)"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g></g></g></g></svg></mjx-container>至少比负样本句向量距离Anchor句向量要近ε。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://book.douban.com/subject/35434773/">Get Start with Google BERT</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/yjw123456/article/details/120464742#:~:text=Sentence-BERT,%28%E4%B8%8B%E6%96%87%E7%AE%80%E7%A7%B0SBERT%29%E7%94%A8%E4%BA%8E%E8%8E%B7%E5%8F%96%E5%9B%BA%E5%AE%9A%E9%95%BF%E5%BA%A6%E7%9A%84%E5%8F%A5%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E3%80%82">Sentence-BERT实战_日积月累，天道酬勤-CSDN博客</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/98855346">什么是BERT？ - 知乎</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/113133510">Sentence-Bert论文笔记 - 知乎</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
+              <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
+              <a href="/tags/BERT/" rel="tag"><i class="fa fa-tag"></i> BERT</a>
+              <a href="/tags/SBERT/" rel="tag"><i class="fa fa-tag"></i> SBERT</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/cl0qsofk6000ik4vn2xyk9qg4/3b48e9e90c3d/" rel="prev" title="记录一次Pytorch安装踩坑记录">
+      <i class="fa fa-chevron-left"></i> 记录一次Pytorch安装踩坑记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/03/cl0qsofk10007k4vn4s99btnt/fe17e847d8c1/" rel="next" title="SBERT在中文STS上使用和微调">
+      SBERT在中文STS上使用和微调 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BERT%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">BERT介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SBERT%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">SBERT的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SBERT%E7%94%A8%E4%BA%8ESTS%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.1.</span> <span class="nav-text">SBERT用于STS任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SBERT%E7%94%A8%E4%BA%8E%E5%8F%A5%E5%AD%90%E5%AF%B9%E5%9B%9E%E5%BD%92%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.2.</span> <span class="nav-text">SBERT用于句子对回归任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%A6%E6%9C%89triplet%E7%9A%84SBERT"><span class="nav-number">2.3.</span> <span class="nav-text">带有triplet的SBERT</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ilingen"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">ilingen</p>
+  <div class="site-description" itemprop="description">A Rookie'blog in NLP&IR</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ilingen" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilingen" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:liulingen429@gmail.com" title="E-Mail → mailto:liulingen429@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://www.zhihu.com/people/liu-lin-gen-77" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;liu-lin-gen-77" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5247783364" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5247783364" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ilingen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+<script>
+    //   自定义邮箱审核规则
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('vsubmit')) {
+            const email = document.querySelector('input[type=email]');
+            const nick = document.querySelector('input[name=nick]');
+            const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+            if (!email.value || !nick.value || !reg.test(email.value)) {
+                const str = `<div class="valert text-center"><div class="vtext">请填写正确的昵称和邮箱！</div></div>`;
+                const vmark = document.querySelector('.vmark');
+                vmark.innerHTML = str;
+                vmark.style.display = 'block';
+                setTimeout(function() {
+                    vmark.style.display = 'none';
+                    vmark.innerHTML = '';
+                }, 2500);
+            }
+        }
+    })
+</script>
+
+<script>
+    // 点击回复直接评论,官方版本点击回复时都是跳回到页面上方的评论框进行回复，评论框是固定不动的
+    // 参考https://immmmm.com/valine-diy,用到jQuery
+    $(document).ready(function(){
+        //$('.vemoji-btn').text('😀');
+        $("#vcomments").on('click', 'span.vat',function(){
+            $(this).parent('div.vmeta').next("div.vcontent").after($("div.vwrap"));
+            $('textarea#veditor').focus();
+        })
+    })
+</script>
+<!-- 评论框美化 -->
+<style>
+    #comments .veditor{
+        min-height: 10rem;
+        background-image: url(https://gitee.com/wugenqiang/PictureBed/raw/master/CS-Notes/20200425091751.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: right;
+        background-color: rgba(255,255,255,0);
+        resize: none;}
+</style>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -23,7 +23,7 @@
   <meta name="description" content="前言在NLP的很多引用中，我们都需要判断一个句子是否合理，比如机器翻译中，需要判断翻译的话是否合理；拼写检查中，正确的词在语句中出现的概率要比错误的词出现的概率更高；在语音识别中，对于同音词的处理。 最初的语言模型是基于语法规则手工编织的，后来被统计语言模型取代。 在机器学习中，对上述需求的做法是计算概率，当一个句子出现的概率较大时，我们可以判断该句更为合理，更容易出现。根据大数定理，当样本量足够">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于语言模型(LM)">
-<meta property="og:url" content="https://ilingen.github.io/2022/03/cl0fbk1dm000dfwvnfq3m2hlg/d2d87ab21c25/index.html">
+<meta property="og:url" content="https://ilingen.github.io/2022/03/cl0qsofk4000ek4vnf9eg4jya/d2d87ab21c25/index.html">
 <meta property="og:site_name" content="ilingen">
 <meta property="og:description" content="前言在NLP的很多引用中，我们都需要判断一个句子是否合理，比如机器翻译中，需要判断翻译的话是否合理；拼写检查中，正确的词在语句中出现的概率要比错误的词出现的概率更高；在语音识别中，对于同音词的处理。 最初的语言模型是基于语法规则手工编织的，后来被统计语言模型取代。 在机器学习中，对上述需求的做法是计算概率，当一个句子出现的概率较大时，我们可以判断该句更为合理，更容易出现。根据大数定理，当样本量足够">
 <meta property="og:locale" content="zh_CN">
@@ -36,14 +36,14 @@
 <meta property="article:modified_time" content="2022-03-05T15:16:28.426Z">
 <meta property="article:author" content="ilingen">
 <meta property="article:tag" content="IR">
+<meta property="article:tag" content="DL">
 <meta property="article:tag" content="NLP">
 <meta property="article:tag" content="ML">
-<meta property="article:tag" content="DL">
 <meta property="article:tag" content="Language Model">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://img-blog.csdn.net/20150222090112900">
 
-<link rel="canonical" href="https://ilingen.github.io/2022/03/cl0fbk1dm000dfwvnfq3m2hlg/d2d87ab21c25/">
+<link rel="canonical" href="https://ilingen.github.io/2022/03/cl0qsofk4000ek4vnf9eg4jya/d2d87ab21c25/">
 
 
 <script id="page-configurations">
@@ -323,7 +323,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/03/cl0fbk1dm000dfwvnfq3m2hlg/d2d87ab21c25/">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/03/cl0qsofk4000ek4vnf9eg4jya/d2d87ab21c25/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -532,9 +532,9 @@ mjx-container[display="true"] + br {
           
           <div class="post-tags">
               <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
+              <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
               <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
               <a href="/tags/ML/" rel="tag"><i class="fa fa-tag"></i> ML</a>
-              <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
               <a href="/tags/Language-Model/" rel="tag"><i class="fa fa-tag"></i> Language Model</a>
           </div>
 
@@ -544,11 +544,11 @@ mjx-container[display="true"] + br {
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/03/cl0fbk1dg0003fwvn895f2mq1/d784dbf69967/" rel="prev" title="Sentence-BERT论文分享">
+    <a href="/2022/03/cl0qsofk20009k4vnbgzqgb6n/d784dbf69967/" rel="prev" title="Sentence-BERT论文分享">
       <i class="fa fa-chevron-left"></i> Sentence-BERT论文分享
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/03/cl0fbk1dl000afwvn9pt1apmw/3b48e9e90c3d/" rel="next" title="记录一次Pytorch安装踩坑记录">
+    <a href="/2022/03/cl0qsofk6000ik4vn2xyk9qg4/3b48e9e90c3d/" rel="next" title="记录一次Pytorch安装踩坑记录">
       记录一次Pytorch安装踩坑记录 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -625,7 +625,7 @@ mjx-container[display="true"] + br {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
