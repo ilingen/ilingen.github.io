@@ -6,7 +6,7 @@
   <link href="https://ilingen.github.io/atom.xml" rel="self"/>
   
   <link href="https://ilingen.github.io/"/>
-  <updated>2022-07-18T03:39:04.972Z</updated>
+  <updated>2022-07-18T07:18:06.285Z</updated>
   <id>https://ilingen.github.io/</id>
   
   <author>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>简单的BM25代码实现</title>
-    <link href="https://ilingen.github.io/2022/07/cl5q7bjid000kdwvn791hdsot/46e44d55ab16/"/>
-    <id>https://ilingen.github.io/2022/07/cl5q7bjid000kdwvn791hdsot/46e44d55ab16/</id>
+    <link href="https://ilingen.github.io/2022/07/cl5qf8teo000jxwvnhpifhj05/46e44d55ab16/"/>
+    <id>https://ilingen.github.io/2022/07/cl5qf8teo000jxwvnhpifhj05/46e44d55ab16/</id>
     <published>2022-07-17T13:13:57.000Z</published>
-    <updated>2022-07-18T03:39:04.972Z</updated>
+    <updated>2022-07-18T07:18:06.285Z</updated>
     
     
     <summary type="html">&lt;p&gt;BM25模型之前已经简单介绍过，这里不再过多赘述，详情请看我之前的一篇blog&lt;/p&gt;
@@ -44,10 +44,10 @@
   
   <entry>
     <title>SBERT在中文STS上使用和微调</title>
-    <link href="https://ilingen.github.io/2022/04/cl5q7bji90009dwvn5gtq9zu7/fd410879eaf6/"/>
-    <id>https://ilingen.github.io/2022/04/cl5q7bji90009dwvn5gtq9zu7/fd410879eaf6/</id>
-    <published>2022-04-14T13:45:59.000Z</published>
-    <updated>2022-07-18T03:40:57.612Z</updated>
+    <link href="https://ilingen.github.io/2022/05/cl5qf8tej0007xwvn4bimas9t/bad36816cb10/"/>
+    <id>https://ilingen.github.io/2022/05/cl5qf8tej0007xwvn4bimas9t/bad36816cb10/</id>
+    <published>2022-05-14T13:45:59.000Z</published>
+    <updated>2022-07-18T07:24:15.834Z</updated>
     
     
     <summary type="html">&lt;p&gt;主要是对SBERT在中文STS数据集上的使用和微调。&lt;/p&gt;
@@ -63,18 +63,43 @@
     
     <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
     
-    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
-    
     <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
+    
+    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
     
     <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
     
   </entry>
   
   <entry>
+    <title>SBERT的训练图示</title>
+    <link href="https://ilingen.github.io/2022/04/cl5qf8tek0009xwvnevcw361j/567779347581/"/>
+    <id>https://ilingen.github.io/2022/04/cl5qf8tek0009xwvnevcw361j/567779347581/</id>
+    <published>2022-04-14T08:21:36.000Z</published>
+    <updated>2022-07-18T07:24:07.712Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;毕设和FAQ检索有关，需要用到SBERT，所以查看了一下SBERT的论文和文档写了一下SBERT和BERT的图示。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
+    
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
+    
+    <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Sentence-BERT论文分享</title>
-    <link href="https://ilingen.github.io/2022/03/cl5q7bjib000ddwvnawq23m6p/a403d45ce03e/"/>
-    <id>https://ilingen.github.io/2022/03/cl5q7bjib000ddwvnawq23m6p/a403d45ce03e/</id>
+    <link href="https://ilingen.github.io/2022/03/cl5qf8tel000axwvnbw21amph/a403d45ce03e/"/>
+    <id>https://ilingen.github.io/2022/03/cl5qf8tel000axwvnbw21amph/a403d45ce03e/</id>
     <published>2022-03-29T09:32:33.000Z</published>
     <updated>2022-07-18T03:41:37.963Z</updated>
     
@@ -89,127 +114,22 @@
     <category term="论文分享" scheme="https://ilingen.github.io/categories/%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
-    
     <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
     
     <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
     
-    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>关于语言模型(LM)</title>
-    <link href="https://ilingen.github.io/2022/03/cl5q7bjic000idwvn5ibs9fa8/ec10d207caff/"/>
-    <id>https://ilingen.github.io/2022/03/cl5q7bjic000idwvn5ibs9fa8/ec10d207caff/</id>
-    <published>2022-03-15T09:10:47.000Z</published>
-    <updated>2022-07-18T03:42:08.472Z</updated>
-    
-    
-    <summary type="html">&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;在NLP的很多应用中，我们都需要判断一个句子是否合理，比如机器翻译中，需要判断翻译的话是否合理；拼写检查中，正确的词在语句中出现的概率要比错误的词出现的概率更高；在语音识别中，对于同音词的处理。&lt;/p&gt;
-&lt;p&gt;最初的语言模型是基于语法规则手工编织的，后来被统计语言模型取代。&lt;/p&gt;
-&lt;p&gt;在机器学习中，对上述需求的做法是计算概率，当一个句子出现的概率较大时，我们可以判断该句更为合理，更容易出现。根据大数定理，当样本量足够大时，概率可以由频率来进行估计，所以我们可以统计频率，再以此估计概率。&lt;/p&gt;
-&lt;p&gt;后续随着神经网络的发展，提出了神经网络语言模型，核心思想是神经网络的强大的拟合能力，直接拟合出语言模型的概率分布。&lt;/p&gt;
-&lt;p&gt;在本博客中，主要重点介绍统计语言模型和简单的神经网络语言模型(NNLM)。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
-    
-    
-    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
-    
-    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
-    
-    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
-    
-    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
-    
-    <category term="Language Model" scheme="https://ilingen.github.io/tags/Language-Model/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>SBERT的训练图示</title>
-    <link href="https://ilingen.github.io/2022/03/cl5q7bji80007dwvn5o5bf2y1/402f3de2c2b2/"/>
-    <id>https://ilingen.github.io/2022/03/cl5q7bji80007dwvn5o5bf2y1/402f3de2c2b2/</id>
-    <published>2022-03-14T08:21:36.000Z</published>
-    <updated>2022-03-14T13:43:27.051Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;毕设和FAQ检索有关，需要用到SBERT，所以查看了一下SBERT的论文和文档写了一下SBERT和BERT的图示。&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
-    
-    
-    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
-    
-    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
-    
     <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
     
-    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>记录一次Pytorch安装踩坑记录</title>
-    <link href="https://ilingen.github.io/2022/03/cl5q7bjib000edwvne0x7gxxw/3b48e9e90c3d/"/>
-    <id>https://ilingen.github.io/2022/03/cl5q7bjib000edwvne0x7gxxw/3b48e9e90c3d/</id>
-    <published>2022-03-06T12:36:23.000Z</published>
-    <updated>2022-03-06T13:33:07.722Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;今天下午在看SBERT的toturial的时候，想写一下SBERT在STS数据集的微调。&lt;/p&gt;
-&lt;p&gt;然后导入torch的时候傻眼了，显示&lt;strong&gt;torch.cuda.is_available()&lt;/strong&gt;为False。&lt;/p&gt;
-&lt;p&gt;嗯~ o(&lt;em&gt;￣▽￣&lt;/em&gt;)o？&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
-    
-    
-    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
-    
-    <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>关于TF-IDF</title>
-    <link href="https://ilingen.github.io/2022/02/cl5q7bjia000adwvn4d6h9t36/e0cb4fcc6c2c/"/>
-    <id>https://ilingen.github.io/2022/02/cl5q7bjia000adwvn4d6h9t36/e0cb4fcc6c2c/</id>
-    <published>2022-02-27T16:44:53.000Z</published>
-    <updated>2022-02-27T16:53:03.099Z</updated>
-    
-    
-    <summary type="html">&lt;h1 id=&quot;TF-IDF&quot;&gt;&lt;a href=&quot;#TF-IDF&quot; class=&quot;headerlink&quot; title=&quot;TF-IDF&quot;&gt;&lt;/a&gt;TF-IDF&lt;/h1&gt;&lt;p&gt;TF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数&lt;/p&gt;
-&lt;p&gt;用于评估一个字词对于一个文件集或一个语料库中的其中一份文档的重要程度, 用作搜索信息检索, 文本挖掘和用户建模的加权因子.&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
-    
-    
-    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
-    
-    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
-    
     <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
     
-    <category term="TF-IDF" scheme="https://ilingen.github.io/tags/TF-IDF/"/>
-    
   </entry>
   
   <entry>
-    <title>关于BM25</title>
-    <link href="https://ilingen.github.io/2022/02/cl5q7bji50003dwvngio818b3/5a689f3945ad/"/>
-    <id>https://ilingen.github.io/2022/02/cl5q7bji50003dwvngio818b3/5a689f3945ad/</id>
-    <published>2022-02-26T15:55:19.000Z</published>
-    <updated>2022-07-18T01:46:47.241Z</updated>
+    <title>BM25无监督检索模型介绍</title>
+    <link href="https://ilingen.github.io/2022/03/cl5qf8tee0001xwvn3l9d3is1/ee2a381ba2b3/"/>
+    <id>https://ilingen.github.io/2022/03/cl5qf8tee0001xwvn3l9d3is1/ee2a381ba2b3/</id>
+    <published>2022-03-26T15:55:19.000Z</published>
+    <updated>2022-07-18T07:17:30.810Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;BM25-Best-Match&quot;&gt;&lt;a href=&quot;#BM25-Best-Match&quot; class=&quot;headerlink&quot; title=&quot;BM25(Best Match)&quot;&gt;&lt;/a&gt;BM25(Best Match)&lt;/h1&gt;&lt;p&gt;BM25算法是在20世纪70年代到80年代由英国的一批信息检索领域的计算机科学家发明, 用来衡量&lt;strong&gt;搜索词query和文档document相似度得分&lt;/strong&gt;的经典算法，这个相关性打分是一个类似TF-IDF的基于统计计数的无监督学习过程.&lt;br&gt;&lt;strong&gt;是一种基于词袋方法的词频计数, 它不考虑多个搜索词在文档中的关联性, 只考虑它们各自的出现次数&lt;/strong&gt;&lt;/p&gt;</summary>
@@ -228,9 +148,89 @@
   </entry>
   
   <entry>
+    <title>语言模型(LM)</title>
+    <link href="https://ilingen.github.io/2022/03/cl5qf8tem000exwvnhtkudp3r/ec10d207caff/"/>
+    <id>https://ilingen.github.io/2022/03/cl5qf8tem000exwvnhtkudp3r/ec10d207caff/</id>
+    <published>2022-03-15T09:10:47.000Z</published>
+    <updated>2022-07-18T07:21:05.407Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;在NLP的很多应用中，我们都需要判断一个句子是否合理，比如机器翻译中，需要判断翻译的话是否合理；拼写检查中，正确的词在语句中出现的概率要比错误的词出现的概率更高；在语音识别中，对于同音词的处理。&lt;/p&gt;
+&lt;p&gt;在机器学习中，对上述需求的做法是计算概率，当一个句子出现的概率较大时，我们可以判断该句更为合理，更容易出现。根据大数定理，当样本量足够大时，概率可以由频率来进行估计，所以我们可以统计频率，再以此估计概率。&lt;/p&gt;
+&lt;p&gt;最初的语言模型是基于语法规则手工编织的，后来被统计语言模型取代。&lt;/p&gt;
+&lt;p&gt;后续随着神经网络的发展，提出了神经网络语言模型，核心思想是神经网络的强大的拟合能力，直接拟合出语言模型的概率分布。&lt;/p&gt;
+&lt;p&gt;在本博客中，主要重点介绍统计语言模型和简单的神经网络语言模型(NNLM)。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
+    
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
+    <category term="Language Model" scheme="https://ilingen.github.io/tags/Language-Model/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>记录一次Pytorch安装踩坑记录</title>
+    <link href="https://ilingen.github.io/2022/03/cl5qf8tem000dxwvn4naghsc6/3b48e9e90c3d/"/>
+    <id>https://ilingen.github.io/2022/03/cl5qf8tem000dxwvn4naghsc6/3b48e9e90c3d/</id>
+    <published>2022-03-06T12:36:23.000Z</published>
+    <updated>2022-07-18T07:23:48.385Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;今天下午在看SBERT的toturial的时候，想写一下SBERT在STS数据集的微调。&lt;/p&gt;
+&lt;p&gt;然后导入torch的时候傻眼了，显示&lt;strong&gt;torch.cuda.is_available()&lt;/strong&gt;为False。&lt;/p&gt;
+&lt;p&gt;嗯~ o(&lt;em&gt;￣▽￣&lt;/em&gt;)o？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
+    
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TF-IDF模型介绍</title>
+    <link href="https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/"/>
+    <id>https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/</id>
+    <published>2022-02-27T16:44:53.000Z</published>
+    <updated>2022-07-18T07:22:25.560Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;TF-IDF&quot;&gt;&lt;a href=&quot;#TF-IDF&quot; class=&quot;headerlink&quot; title=&quot;TF-IDF&quot;&gt;&lt;/a&gt;TF-IDF&lt;/h1&gt;&lt;p&gt;TF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数&lt;/p&gt;
+&lt;p&gt;用于评估一个字词对于一个文件集或一个语料库中的其中一份文档的重要程度, 用作搜索信息检索, 文本挖掘和用户建模的加权因子.&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="知识整理" scheme="https://ilingen.github.io/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/"/>
+    
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="ML" scheme="https://ilingen.github.io/tags/ML/"/>
+    
+    <category term="TF-IDF" scheme="https://ilingen.github.io/tags/TF-IDF/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Hexo个人Blog搭建--基础</title>
-    <link href="https://ilingen.github.io/2022/02/cl5q7bji20001dwvn3g5uhwyv/5ad495ef4974/"/>
-    <id>https://ilingen.github.io/2022/02/cl5q7bji20001dwvn3g5uhwyv/5ad495ef4974/</id>
+    <link href="https://ilingen.github.io/2022/02/cl5qf8teg0003xwvn5074fppn/5ad495ef4974/"/>
+    <id>https://ilingen.github.io/2022/02/cl5qf8teg0003xwvn5074fppn/5ad495ef4974/</id>
     <published>2022-02-16T15:53:24.000Z</published>
     <updated>2022-02-27T16:39:47.951Z</updated>
     

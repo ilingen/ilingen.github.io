@@ -22,23 +22,23 @@
 
   <meta name="description" content="TF-IDFTF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数 用于评估一个字词对于一个文件集或一个语料库中的其中一份文档的重要程度, 用作搜索信息检索, 文本挖掘和用户建模的加权因子.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于TF-IDF">
-<meta property="og:url" content="https://ilingen.github.io/2022/02/cl5q7bjia000adwvn4d6h9t36/e0cb4fcc6c2c/index.html">
+<meta property="og:title" content="TF-IDF模型介绍">
+<meta property="og:url" content="https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/index.html">
 <meta property="og:site_name" content="ilingen">
 <meta property="og:description" content="TF-IDFTF-IDF(term frequency-inverse document frequency)用于信息检索和数据挖掘的常用加权技术. TF是词频, IDF是逆文本指数 用于评估一个字词对于一个文件集或一个语料库中的其中一份文档的重要程度, 用作搜索信息检索, 文本挖掘和用户建模的加权因子.">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/15198150-82a3c4c9e23b8540.png?imageMogr2/auto-orient/strip|imageView2/2/w/403/format/webp">
 <meta property="article:published_time" content="2022-02-27T16:44:53.000Z">
-<meta property="article:modified_time" content="2022-02-27T16:53:03.099Z">
+<meta property="article:modified_time" content="2022-07-18T07:22:25.560Z">
 <meta property="article:author" content="ilingen">
 <meta property="article:tag" content="IR">
-<meta property="article:tag" content="ML">
 <meta property="article:tag" content="NLP">
+<meta property="article:tag" content="ML">
 <meta property="article:tag" content="TF-IDF">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/15198150-82a3c4c9e23b8540.png?imageMogr2/auto-orient/strip|imageView2/2/w/403/format/webp">
 
-<link rel="canonical" href="https://ilingen.github.io/2022/02/cl5q7bjia000adwvn4d6h9t36/e0cb4fcc6c2c/">
+<link rel="canonical" href="https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/">
 
 
 <script id="page-configurations">
@@ -51,7 +51,7 @@
   };
 </script>
 
-  <title>关于TF-IDF | ilingen</title>
+  <title>TF-IDF模型介绍 | ilingen</title>
   
 
 
@@ -206,7 +206,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/02/cl5q7bjia000adwvn4d6h9t36/e0cb4fcc6c2c/">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -219,7 +219,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          关于TF-IDF
+          TF-IDF模型介绍
         </h1>
 
         <div class="post-meta">
@@ -228,10 +228,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-02-28 00:44:53 / 修改时间：00:53:03" itemprop="dateCreated datePublished" datetime="2022-02-28T00:44:53+08:00">2022-02-28</time>
+              <time title="创建时间：2022-02-28 00:44:53" itemprop="dateCreated datePublished" datetime="2022-02-28T00:44:53+08:00">2022-02-28</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-18 15:22:25" itemprop="dateModified" datetime="2022-07-18T15:22:25+08:00">2022-07-18</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -285,7 +291,7 @@
 <p>1972 年，英国的计算机科学家卡伦 · 琼斯（Karen Spärck Jones）在《从统计的观点看词的特殊性及其在文档检索中的应用》（A Statistical Interpretation of Term Specificity and Its Application in Retrieval） 一文中第一次详细地阐述了 IDF 的应用。其后卡伦又在《检索目录中的词赋值权重》（Index Term Weighting）一文中对 TF 和 IDF 的结合进行了论述。可以说，卡伦是第一位从理论上对 TF-IDF 进行完整论证的计算机科学家，因此后世也有很多人把 TF-IDF 的发明归结于卡伦。</p>
 <p>杰拉德本人被认为是 “信息检索之父”。他 1927 年出生于德国的纽伦堡，并与 1950 年和 1952 年先后从纽约的布鲁克林学院获得数学学士和硕士学位，1958 年从哈佛大学获得应用数学博士学位，之后来到康奈尔大学参与组建计算机系。为了致敬杰拉德本人对现代信息检索技术的卓越贡献，现在，美国计算机协会 ACM（Association of Computing Machinery）每三年颁发一次“杰拉德 · 索尔顿奖”（Gerard Salton Award），用于表彰对信息检索技术有突出贡献的研究人员。卡伦 · 琼斯在 1988 年获得了第二届“杰拉德 · 索尔顿奖” 的殊荣。</p>
 <h1 id="思考与不足"><a href="#思考与不足" class="headerlink" title="思考与不足"></a>思考与不足</h1><p>TF-IDF算法主要适用于英文,中文首先要进行分词, 分词后要解决多词一义, 一次多义的问题.<br>这两个问题不能通过TF-IDF方法很好的解决.<br>于是就有了后来的词嵌入方法, 用向量表示一个词.</p>
-<p>后续会继续更新有关TF-IDF</p>
+<p>后续有机会会继续更新对该模型的相关认识。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/091383e86825">Tf-Idf详解及应用 - 简书</a><br><a target="_blank" rel="noopener" href="https://easyai.tech/ai-definition/tf-idf/">一文看懂 TF-IDF (概念图解+4大变种+发展历史)</a></p>
 <p>未看<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/geeks-reign/p/TF-IDF.html">经典文本特征表示方法: TF-IDF - geeks_reign - 博客园</a></p>
 
@@ -299,8 +305,8 @@
           
           <div class="post-tags">
               <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
-              <a href="/tags/ML/" rel="tag"><i class="fa fa-tag"></i> ML</a>
               <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
+              <a href="/tags/ML/" rel="tag"><i class="fa fa-tag"></i> ML</a>
               <a href="/tags/TF-IDF/" rel="tag"><i class="fa fa-tag"></i> TF-IDF</a>
           </div>
 
@@ -310,11 +316,11 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/02/cl5q7bji50003dwvngio818b3/5a689f3945ad/" rel="prev" title="关于BM25">
-      <i class="fa fa-chevron-left"></i> 关于BM25
+    <a href="/2022/02/cl5qf8teg0003xwvn5074fppn/5ad495ef4974/" rel="prev" title="Hexo个人Blog搭建--基础">
+      <i class="fa fa-chevron-left"></i> Hexo个人Blog搭建--基础
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/03/cl5q7bjib000edwvne0x7gxxw/3b48e9e90c3d/" rel="next" title="记录一次Pytorch安装踩坑记录">
+    <a href="/2022/03/cl5qf8tem000dxwvn4naghsc6/3b48e9e90c3d/" rel="next" title="记录一次Pytorch安装踩坑记录">
       记录一次Pytorch安装踩坑记录 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
