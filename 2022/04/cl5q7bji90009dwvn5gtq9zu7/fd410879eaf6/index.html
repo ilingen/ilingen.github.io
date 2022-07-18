@@ -23,23 +23,23 @@
   <meta name="description" content="主要是对SBERT在中文STS数据集上的使用和微调。 SBERT的官网在这 安装也很简单，直接通过pip即可">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SBERT在中文STS上使用和微调">
-<meta property="og:url" content="https://ilingen.github.io/2022/03/cl17b4fgt00011kvn6pws9hjn/fe17e847d8c1/index.html">
+<meta property="og:url" content="https://ilingen.github.io/2022/04/cl5q7bji90009dwvn5gtq9zu7/fd410879eaf6/index.html">
 <meta property="og:site_name" content="ilingen">
 <meta property="og:description" content="主要是对SBERT在中文STS数据集上的使用和微调。 SBERT的官网在这 安装也很简单，直接通过pip即可">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png">
-<meta property="article:published_time" content="2022-03-14T13:45:59.000Z">
-<meta property="article:modified_time" content="2022-03-14T14:21:34.434Z">
+<meta property="article:published_time" content="2022-04-14T13:45:59.000Z">
+<meta property="article:modified_time" content="2022-07-18T03:40:57.612Z">
 <meta property="article:author" content="ilingen">
 <meta property="article:tag" content="IR">
 <meta property="article:tag" content="DL">
-<meta property="article:tag" content="Pytorch">
 <meta property="article:tag" content="SBERT">
+<meta property="article:tag" content="Pytorch">
 <meta property="article:tag" content="STS">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png">
 
-<link rel="canonical" href="https://ilingen.github.io/2022/03/cl17b4fgt00011kvn6pws9hjn/fe17e847d8c1/">
+<link rel="canonical" href="https://ilingen.github.io/2022/04/cl5q7bji90009dwvn5gtq9zu7/fd410879eaf6/">
 
 
 <script id="page-configurations">
@@ -319,7 +319,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/03/cl17b4fgt00011kvn6pws9hjn/fe17e847d8c1/">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/04/cl5q7bji90009dwvn5gtq9zu7/fd410879eaf6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -341,10 +341,16 @@ mjx-container[display="true"] + br {
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-03-14 21:45:59 / 修改时间：22:21:34" itemprop="dateCreated datePublished" datetime="2022-03-14T21:45:59+08:00">2022-03-14</time>
+              <time title="创建时间：2022-04-14 21:45:59" itemprop="dateCreated datePublished" datetime="2022-04-14T21:45:59+08:00">2022-04-14</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-18 11:40:57" itemprop="dateModified" datetime="2022-07-18T11:40:57+08:00">2022-07-18</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -380,14 +386,17 @@ mjx-container[display="true"] + br {
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install sentence_transformers</span><br></pre></td></tr></table></figure>
 <h1 id="SBERT-直接进行match"><a href="#SBERT-直接进行match" class="headerlink" title="SBERT 直接进行match"></a>SBERT 直接进行match</h1><p>用SBERT直接进行相似度句子匹配。</p>
 <p> 导入相应的包</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sentence_transformers <span class="keyword">import</span> SentenceTransformer</span><br><span class="line"><span class="keyword">import</span> scipy.spatial</span><br><span class="line"><span class="comment"># SciPy 通过 scipy.spatial 模块处理空间数据，比如判断一个点是否在边界内、计算给定点周围距离最近点以及给定距离内的所有点</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入模型</span></span><br><span class="line">embedder=SentenceTransformer(<span class="string">'bert-base-chinese'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sentence_transformers <span class="keyword">import</span> SentenceTransformer</span><br><span class="line"><span class="comment"># SentenceTransformer用来加载或者创建模型，用于将句子/文本映射到嵌入</span></span><br><span class="line"><span class="comment"># 默认输入句子长度为128个单词</span></span><br><span class="line"><span class="comment"># model.max_seq_length=200更改</span></span><br><span class="line"><span class="keyword">import</span> scipy.spatial</span><br><span class="line"><span class="comment"># SciPy 通过 scipy.spatial 模块处理空间数据，比如判断一个点是否在边界内、计算给定点周围距离最近点以及给定距离内的所有点</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入模型</span></span><br><span class="line">embedder=SentenceTransformer(<span class="string">'bert-base-chinese'</span>)</span><br></pre></td></tr></table></figure>
 <p>构建相应的语料库，这里为了简单，就只是用了几句话</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">corpus=[<span class="string">'这是一支铅笔'</span>,<span class="string">'关节置换术'</span>,<span class="string">'我爱北京天安门'</span>,<span class="string">'北京是中国首都'</span>,<span class="string">'我想做个手术'</span>,<span class="string">'你在哪里啊'</span>]</span><br><span class="line"><span class="comment"># 为每句话进行编码映射</span></span><br><span class="line">corpus_embeddings=embedder.encode(corpus)</span><br><span class="line"><span class="comment"># 查看映射的矩阵</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f'corpus_embeddings:<span class="subst">{corpus_embeddings}</span>'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">corpus=[<span class="string">'这是一支铅笔'</span>,<span class="string">'关节置换术'</span>,<span class="string">'我爱北京天安门'</span>,<span class="string">'北京是中国首都'</span>,<span class="string">'我想做个手术'</span>,<span class="string">'你在哪里啊'</span>]</span><br><span class="line"><span class="comment"># 为每句话进行编码映射</span></span><br><span class="line">corpus_embeddings=embedder.encode(corpus)</span><br><span class="line"><span class="comment"># encode计算句子嵌入</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">参数</span></span><br><span class="line"><span class="string">sentence 输入可以是str，也可以是list[str]</span></span><br><span class="line"><span class="string">batch_size=32</span></span><br><span class="line"><span class="string">show_progress_bar 编码的进度条显示</span></span><br><span class="line"><span class="string">convert_to_numpy/tensor 返回的numpy或者tensor形式</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 查看映射的矩阵</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f'corpus_embeddings:<span class="subst">{corpus_embeddings}</span>'</span>)</span><br></pre></td></tr></table></figure>
+<p>存储和加载embedding矩阵</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Store sentence</span></span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">"embeddings.pkl"</span>,<span class="string">'rb'</span>) <span class="keyword">as</span> fout:</span><br><span class="line">    pickle.dump({<span class="string">"sentences"</span>: sentences,<span class="string">'embeddings'</span>: embeddings}, fout, protocol=pickle.HIGHEST_PROTOCOL)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># Load sentence</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">"embeddings.pkl"</span>,<span class="string">'rb'</span>) <span class="keyword">as</span> fin:</span><br><span class="line">    stored_data=pickle.data(fin)</span><br><span class="line">    stored_sentences=stored_data[<span class="string">'sentences'</span>]</span><br><span class="line">    stored_embeddings=stored_data[<span class="string">'embeddings'</span>]</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
 <p>构建query查询实例，并进行编码映射</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">queries=[<span class="string">'心脏手术'</span>,<span class="string">'中国首都在哪里'</span>]</span><br><span class="line">query_embeddings=embedder.encode(queries)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f'query_embeddings:<span class="subst">{query_embeddings}</span>'</span>)</span><br></pre></td></tr></table></figure>
 <p>根据corpus的embedding矩阵和query的embedding进行余弦相似度的查询</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''python</span></span><br><span class="line"><span class="string">这里用到一个函数</span></span><br><span class="line"><span class="string">scipy.spatial.distance.cdist(XA,XB,metric='euclidean',*,out=None,**kwargs)</span></span><br><span class="line"><span class="string">这里对官网的文档进行个人翻译</span></span><br><span class="line"><span class="string">计算两个输入集合中的每对之间的距离</span></span><br><span class="line"><span class="string">input: </span></span><br><span class="line"><span class="string">XA: array_like mA个n维向量</span></span><br><span class="line"><span class="string">XB: array_like mB个n维向量</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">XA,XB默认会转化为float</span></span><br><span class="line"><span class="string">metric: 距离的度量方式, 可选择的有很多: 'cosine', 'hamming','euclidean'等</span></span><br><span class="line"><span class="string">**kwargs: dict, optional</span></span><br><span class="line"><span class="string">对于选择不同距离度量的可选参数。</span></span><br><span class="line"><span class="string">比如在Minkowski距离时, p作为可选参数, 可以直接输入, 默认为2</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Output:</span></span><br><span class="line"><span class="string">返回一个mA x mB的矩阵Y。</span></span><br><span class="line"><span class="string">对于矩阵的yij, 对应的为XA中第i个n维向量和XB中的第j个n维向量的距离度量。</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 对于每个query，使用余弦相似度查询最接近的closest_n个句子</span></span><br><span class="line"></span><br><span class="line">closest_n=<span class="number">2</span></span><br><span class="line"><span class="keyword">for</span> query, query_embedding <span class="keyword">in</span> <span class="built_in">zip</span>(queries, query_embeddings):</span><br><span class="line">    distances=scipy.spatial.distance.cdist([query_embedding],corpus_embeddings,<span class="string">'cosine'</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="comment"># cdist返回一个1xlen(corpus)的matrix</span></span><br><span class="line">    <span class="comment"># distances: array len(corpus)</span></span><br><span class="line">    <span class="comment"># print(len(distances))</span></span><br><span class="line">    <span class="comment"># 按照距离逆序</span></span><br><span class="line">    results=<span class="built_in">zip</span>(<span class="built_in">range</span>(<span class="built_in">len</span>(distances)),distances)</span><br><span class="line">    <span class="comment"># results:[(index_1, distance_1),(index_2,distance_2)...]</span></span><br><span class="line">    results=<span class="built_in">sorted</span>(results,key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>]) <span class="comment"># 根据距离进行升序排列</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'='</span>*<span class="number">10</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'Query:'</span>,query)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f'Result: top-<span class="subst">{closest_n}</span> most similar sentences in corpus:'</span>)</span><br><span class="line">    <span class="keyword">for</span> idx, distance <span class="keyword">in</span> results[<span class="number">0</span>:closest_n]:</span><br><span class="line">        <span class="comment"># 因为是cosine距离，所以这里相似度是1-distance</span></span><br><span class="line">        <span class="built_in">print</span>(corpus[idx].strip(),<span class="string">"(Score:%.4f)"</span>%(<span class="number">1</span>-distance))</span><br></pre></td></tr></table></figure>
 <p>总的来说还是较为简单的，huggingface已经给封装好了相关的库，只需要对输入和输出进行运算即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 采用自带的cos工具包完成</span></span><br><span class="line">cos_sim=util.cos_sim(embeddings, embeddings)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">computes the cosine similarity cos_sim(a[i],b[j]).</span></span><br><span class="line"><span class="string">return Matrix with res[i][j]=cos_sim(a[i],b[j])</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">all_sentence_combinations=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(cos_sim)-<span class="number">1</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(i+<span class="number">1</span>, <span class="built_in">len</span>(cos_sim)):</span><br><span class="line">        all_sentence_combinations.append([cos_sim[i][j],i,j])</span><br><span class="line"><span class="comment"># sort</span></span><br><span class="line">all_sentence_combinations=<span class="built_in">sorted</span>(all_sentence_combinations, key=<span class="keyword">lambda</span> x:x[<span class="number">0</span>], reverse=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># print("top-5 most similar pairs:")</span></span><br><span class="line"><span class="keyword">for</span> score,i,j <span class="keyword">in</span> all_sentence_combinations[<span class="number">0</span>:<span class="number">5</span>]:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"{}\t{}\t{:.4f}"</span>.<span class="built_in">format</span>(sentences[i], sentences[j], cos_sim[i][j]))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <h1 id="SBERT在中文STS数据集上微调"><a href="#SBERT在中文STS数据集上微调" class="headerlink" title="SBERT在中文STS数据集上微调"></a>SBERT在中文STS数据集上微调</h1><h2 id="中文STS数据集"><a href="#中文STS数据集" class="headerlink" title="中文STS数据集"></a>中文STS数据集</h2><p>采用的是网上开源的数据集，数据格式如下图所示</p>
 <p><img src="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png" alt=""></p>
 <p>是一个典型的STS任务。</p>
@@ -418,8 +427,8 @@ mjx-container[display="true"] + br {
           <div class="post-tags">
               <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
               <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
-              <a href="/tags/Pytorch/" rel="tag"><i class="fa fa-tag"></i> Pytorch</a>
               <a href="/tags/SBERT/" rel="tag"><i class="fa fa-tag"></i> SBERT</a>
+              <a href="/tags/Pytorch/" rel="tag"><i class="fa fa-tag"></i> Pytorch</a>
               <a href="/tags/STS/" rel="tag"><i class="fa fa-tag"></i> STS</a>
           </div>
 
@@ -429,10 +438,13 @@ mjx-container[display="true"] + br {
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/03/cl17b4fgz00071kvnhfm626tn/402f3de2c2b2/" rel="prev" title="SBERT的训练图示">
-      <i class="fa fa-chevron-left"></i> SBERT的训练图示
+    <a href="/2022/03/cl5q7bjib000ddwvnawq23m6p/a403d45ce03e/" rel="prev" title="Sentence-BERT论文分享">
+      <i class="fa fa-chevron-left"></i> Sentence-BERT论文分享
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/cl5q7bjid000kdwvn791hdsot/46e44d55ab16/" rel="next" title="简单的BM25代码实现">
+      简单的BM25代码实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -507,7 +519,7 @@ mjx-container[display="true"] + br {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -520,7 +532,7 @@ mjx-container[display="true"] + br {
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
