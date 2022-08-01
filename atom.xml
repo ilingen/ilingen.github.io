@@ -6,7 +6,7 @@
   <link href="https://ilingen.github.io/atom.xml" rel="self"/>
   
   <link href="https://ilingen.github.io/"/>
-  <updated>2022-07-18T07:18:06.285Z</updated>
+  <updated>2022-08-01T14:21:42.512Z</updated>
   <id>https://ilingen.github.io/</id>
   
   <author>
@@ -17,9 +17,38 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>BERT微调使用</title>
+    <link href="https://ilingen.github.io/2022/08/cl6aunxvy0001jcvnee8j67sh/edccb5976722/"/>
+    <id>https://ilingen.github.io/2022/08/cl6aunxvy0001jcvnee8j67sh/edccb5976722/</id>
+    <published>2022-08-01T15:40:39.000Z</published>
+    <updated>2022-08-01T14:21:42.512Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;因为项目和毕设的缘故，做了挺多关于Bert分类的实际操作的，本文主要记录下transformers库中使用较多的类。&lt;br&gt;在本文中，你将看到&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bert模型的简单回顾&lt;/li&gt;
+&lt;li&gt;BertConfig，BertTokenizer，BertModel的简单使用&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="工具使用" scheme="https://ilingen.github.io/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/"/>
+    
+    
+    <category term="IR" scheme="https://ilingen.github.io/tags/IR/"/>
+    
+    <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
+    
+    <category term="Pretrain" scheme="https://ilingen.github.io/tags/Pretrain/"/>
+    
+    <category term="Bert" scheme="https://ilingen.github.io/tags/Bert/"/>
+    
+  </entry>
+  
+  <entry>
     <title>简单的BM25代码实现</title>
-    <link href="https://ilingen.github.io/2022/07/cl5qf8teo000jxwvnhpifhj05/46e44d55ab16/"/>
-    <id>https://ilingen.github.io/2022/07/cl5qf8teo000jxwvnhpifhj05/46e44d55ab16/</id>
+    <link href="https://ilingen.github.io/2022/07/cl6aunxwb000ojcvn27vw7yup/46e44d55ab16/"/>
+    <id>https://ilingen.github.io/2022/07/cl6aunxwb000ojcvn27vw7yup/46e44d55ab16/</id>
     <published>2022-07-17T13:13:57.000Z</published>
     <updated>2022-07-18T07:18:06.285Z</updated>
     
@@ -44,8 +73,8 @@
   
   <entry>
     <title>SBERT在中文STS上使用和微调</title>
-    <link href="https://ilingen.github.io/2022/05/cl5qf8tej0007xwvn4bimas9t/bad36816cb10/"/>
-    <id>https://ilingen.github.io/2022/05/cl5qf8tej0007xwvn4bimas9t/bad36816cb10/</id>
+    <link href="https://ilingen.github.io/2022/05/cl6aunxw7000djcvn7dc9ea7p/bad36816cb10/"/>
+    <id>https://ilingen.github.io/2022/05/cl6aunxw7000djcvn7dc9ea7p/bad36816cb10/</id>
     <published>2022-05-14T13:45:59.000Z</published>
     <updated>2022-07-18T07:24:15.834Z</updated>
     
@@ -63,18 +92,18 @@
     
     <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
     
-    <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
-    
     <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
     
     <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
+    
+    <category term="Pytorch" scheme="https://ilingen.github.io/tags/Pytorch/"/>
     
   </entry>
   
   <entry>
     <title>SBERT的训练图示</title>
-    <link href="https://ilingen.github.io/2022/04/cl5qf8tek0009xwvnevcw361j/567779347581/"/>
-    <id>https://ilingen.github.io/2022/04/cl5qf8tek0009xwvnevcw361j/567779347581/</id>
+    <link href="https://ilingen.github.io/2022/04/cl6aunxw50009jcvn2en0g6kx/567779347581/"/>
+    <id>https://ilingen.github.io/2022/04/cl6aunxw50009jcvn2en0g6kx/567779347581/</id>
     <published>2022-04-14T08:21:36.000Z</published>
     <updated>2022-07-18T07:24:07.712Z</updated>
     
@@ -90,16 +119,16 @@
     
     <category term="DL" scheme="https://ilingen.github.io/tags/DL/"/>
     
-    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
-    
     <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
+    
+    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
     
   </entry>
   
   <entry>
     <title>Sentence-BERT论文分享</title>
-    <link href="https://ilingen.github.io/2022/03/cl5qf8tel000axwvnbw21amph/a403d45ce03e/"/>
-    <id>https://ilingen.github.io/2022/03/cl5qf8tel000axwvnbw21amph/a403d45ce03e/</id>
+    <link href="https://ilingen.github.io/2022/03/cl6aunxw5000ajcvnc1u3gsjh/a403d45ce03e/"/>
+    <id>https://ilingen.github.io/2022/03/cl6aunxw5000ajcvnc1u3gsjh/a403d45ce03e/</id>
     <published>2022-03-29T09:32:33.000Z</published>
     <updated>2022-07-18T03:41:37.963Z</updated>
     
@@ -114,20 +143,20 @@
     <category term="论文分享" scheme="https://ilingen.github.io/categories/%E8%AE%BA%E6%96%87%E5%88%86%E4%BA%AB/"/>
     
     
-    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
-    
-    <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
-    
     <category term="BERT" scheme="https://ilingen.github.io/tags/BERT/"/>
     
+    <category term="SBERT" scheme="https://ilingen.github.io/tags/SBERT/"/>
+    
     <category term="NLP" scheme="https://ilingen.github.io/tags/NLP/"/>
+    
+    <category term="STS" scheme="https://ilingen.github.io/tags/STS/"/>
     
   </entry>
   
   <entry>
     <title>BM25无监督检索模型介绍</title>
-    <link href="https://ilingen.github.io/2022/03/cl5qf8tee0001xwvn3l9d3is1/ee2a381ba2b3/"/>
-    <id>https://ilingen.github.io/2022/03/cl5qf8tee0001xwvn3l9d3is1/ee2a381ba2b3/</id>
+    <link href="https://ilingen.github.io/2022/03/cl6aunxw40007jcvn5q3we1aw/ee2a381ba2b3/"/>
+    <id>https://ilingen.github.io/2022/03/cl6aunxw40007jcvn5q3we1aw/ee2a381ba2b3/</id>
     <published>2022-03-26T15:55:19.000Z</published>
     <updated>2022-07-18T07:17:30.810Z</updated>
     
@@ -149,8 +178,8 @@
   
   <entry>
     <title>语言模型(LM)</title>
-    <link href="https://ilingen.github.io/2022/03/cl5qf8tem000exwvnhtkudp3r/ec10d207caff/"/>
-    <id>https://ilingen.github.io/2022/03/cl5qf8tem000exwvnhtkudp3r/ec10d207caff/</id>
+    <link href="https://ilingen.github.io/2022/03/cl6aunxw8000ijcvn79ek428r/ec10d207caff/"/>
+    <id>https://ilingen.github.io/2022/03/cl6aunxw8000ijcvn79ek428r/ec10d207caff/</id>
     <published>2022-03-15T09:10:47.000Z</published>
     <updated>2022-07-18T07:21:05.407Z</updated>
     
@@ -180,8 +209,8 @@
   
   <entry>
     <title>记录一次Pytorch安装踩坑记录</title>
-    <link href="https://ilingen.github.io/2022/03/cl5qf8tem000dxwvn4naghsc6/3b48e9e90c3d/"/>
-    <id>https://ilingen.github.io/2022/03/cl5qf8tem000dxwvn4naghsc6/3b48e9e90c3d/</id>
+    <link href="https://ilingen.github.io/2022/03/cl6aunxw7000ejcvn5u8ib1h2/3b48e9e90c3d/"/>
+    <id>https://ilingen.github.io/2022/03/cl6aunxw7000ejcvn5u8ib1h2/3b48e9e90c3d/</id>
     <published>2022-03-06T12:36:23.000Z</published>
     <updated>2022-07-18T07:23:48.385Z</updated>
     
@@ -203,8 +232,8 @@
   
   <entry>
     <title>TF-IDF模型介绍</title>
-    <link href="https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/"/>
-    <id>https://ilingen.github.io/2022/02/cl5qf8ten000ixwvnfic06xjo/e0cb4fcc6c2c/</id>
+    <link href="https://ilingen.github.io/2022/02/cl6aunxw9000kjcvnaxvcb3yd/e0cb4fcc6c2c/"/>
+    <id>https://ilingen.github.io/2022/02/cl6aunxw9000kjcvnaxvcb3yd/e0cb4fcc6c2c/</id>
     <published>2022-02-27T16:44:53.000Z</published>
     <updated>2022-07-18T07:22:25.560Z</updated>
     
@@ -229,8 +258,8 @@
   
   <entry>
     <title>Hexo个人Blog搭建--基础</title>
-    <link href="https://ilingen.github.io/2022/02/cl5qf8teg0003xwvn5074fppn/5ad495ef4974/"/>
-    <id>https://ilingen.github.io/2022/02/cl5qf8teg0003xwvn5074fppn/5ad495ef4974/</id>
+    <link href="https://ilingen.github.io/2022/02/cl6aunxw10003jcvn3ousf7zi/5ad495ef4974/"/>
+    <id>https://ilingen.github.io/2022/02/cl6aunxw10003jcvn3ousf7zi/5ad495ef4974/</id>
     <published>2022-02-16T15:53:24.000Z</published>
     <updated>2022-02-27T16:39:47.951Z</updated>
     
