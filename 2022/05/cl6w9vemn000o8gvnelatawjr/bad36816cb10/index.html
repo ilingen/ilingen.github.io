@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilingen.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="主要是对SBERT在中文STS数据集上的使用和微调。 SBERT的官网在这 安装也很简单，直接通过pip即可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SBERT在中文STS上使用和微调">
+<meta property="og:url" content="https://ilingen.github.io/2022/05/cl6w9vemn000o8gvnelatawjr/bad36816cb10/index.html">
+<meta property="og:site_name" content="ilingen">
+<meta property="og:description" content="主要是对SBERT在中文STS数据集上的使用和微调。 SBERT的官网在这 安装也很简单，直接通过pip即可">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png">
+<meta property="article:published_time" content="2022-05-14T13:45:59.000Z">
+<meta property="article:modified_time" content="2022-07-18T07:24:15.834Z">
+<meta property="article:author" content="ilingen">
+<meta property="article:tag" content="IR">
+<meta property="article:tag" content="DL">
+<meta property="article:tag" content="SBERT">
+<meta property="article:tag" content="Pytorch">
+<meta property="article:tag" content="STS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png">
+
+<link rel="canonical" href="https://ilingen.github.io/2022/05/cl6w9vemn000o8gvnelatawjr/bad36816cb10/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SBERT在中文STS上使用和微调 | ilingen</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="ilingen" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ilingen</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">曾许人间第一流</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/05/cl6w9vemn000o8gvnelatawjr/bad36816cb10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="ilingen">
+      <meta itemprop="description" content="A Rookie'blog in NLP&IR">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ilingen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SBERT在中文STS上使用和微调
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-14 21:45:59" itemprop="dateCreated datePublished" datetime="2022-05-14T21:45:59+08:00">2022-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-18 15:24:15" itemprop="dateModified" datetime="2022-07-18T15:24:15+08:00">2022-07-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" itemprop="url" rel="index"><span itemprop="name">工具使用</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>主要是对SBERT在中文STS数据集上的使用和微调。</p>
+<p>SBERT的官网<a target="_blank" rel="noopener" href="https://www.sbert.net/index.html">在这</a></p>
+<p>安装也很简单，直接通过pip即可</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install sentence_transformers</span><br></pre></td></tr></table></figure>
+<h1 id="SBERT-直接进行match"><a href="#SBERT-直接进行match" class="headerlink" title="SBERT 直接进行match"></a>SBERT 直接进行match</h1><p>用SBERT直接进行相似度句子匹配。</p>
+<p> 导入相应的包</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sentence_transformers <span class="keyword">import</span> SentenceTransformer</span><br><span class="line"><span class="comment"># SentenceTransformer用来加载或者创建模型，用于将句子/文本映射到嵌入</span></span><br><span class="line"><span class="comment"># 默认输入句子长度为128个单词</span></span><br><span class="line"><span class="comment"># model.max_seq_length=200更改</span></span><br><span class="line"><span class="keyword">import</span> scipy.spatial</span><br><span class="line"><span class="comment"># SciPy 通过 scipy.spatial 模块处理空间数据，比如判断一个点是否在边界内、计算给定点周围距离最近点以及给定距离内的所有点</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入模型</span></span><br><span class="line">embedder=SentenceTransformer(<span class="string">'bert-base-chinese'</span>)</span><br></pre></td></tr></table></figure>
+<p>构建相应的语料库，这里为了简单，就只是用了几句话</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">corpus=[<span class="string">'这是一支铅笔'</span>,<span class="string">'关节置换术'</span>,<span class="string">'我爱北京天安门'</span>,<span class="string">'北京是中国首都'</span>,<span class="string">'我想做个手术'</span>,<span class="string">'你在哪里啊'</span>]</span><br><span class="line"><span class="comment"># 为每句话进行编码映射</span></span><br><span class="line">corpus_embeddings=embedder.encode(corpus)</span><br><span class="line"><span class="comment"># encode计算句子嵌入</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">参数</span></span><br><span class="line"><span class="string">sentence 输入可以是str，也可以是list[str]</span></span><br><span class="line"><span class="string">batch_size=32</span></span><br><span class="line"><span class="string">show_progress_bar 编码的进度条显示</span></span><br><span class="line"><span class="string">convert_to_numpy/tensor 返回的numpy或者tensor形式</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 查看映射的矩阵</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f'corpus_embeddings:<span class="subst">{corpus_embeddings}</span>'</span>)</span><br></pre></td></tr></table></figure>
+<p>存储和加载embedding矩阵</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Store sentence</span></span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">"embeddings.pkl"</span>,<span class="string">'rb'</span>) <span class="keyword">as</span> fout:</span><br><span class="line">    pickle.dump({<span class="string">"sentences"</span>: sentences,<span class="string">'embeddings'</span>: embeddings}, fout, protocol=pickle.HIGHEST_PROTOCOL)</span><br><span class="line">    </span><br><span class="line"><span class="comment"># Load sentence</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">"embeddings.pkl"</span>,<span class="string">'rb'</span>) <span class="keyword">as</span> fin:</span><br><span class="line">    stored_data=pickle.data(fin)</span><br><span class="line">    stored_sentences=stored_data[<span class="string">'sentences'</span>]</span><br><span class="line">    stored_embeddings=stored_data[<span class="string">'embeddings'</span>]</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+<p>构建query查询实例，并进行编码映射</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">queries=[<span class="string">'心脏手术'</span>,<span class="string">'中国首都在哪里'</span>]</span><br><span class="line">query_embeddings=embedder.encode(queries)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f'query_embeddings:<span class="subst">{query_embeddings}</span>'</span>)</span><br></pre></td></tr></table></figure>
+<p>根据corpus的embedding矩阵和query的embedding进行余弦相似度的查询</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''python</span></span><br><span class="line"><span class="string">这里用到一个函数</span></span><br><span class="line"><span class="string">scipy.spatial.distance.cdist(XA,XB,metric='euclidean',*,out=None,**kwargs)</span></span><br><span class="line"><span class="string">这里对官网的文档进行个人翻译</span></span><br><span class="line"><span class="string">计算两个输入集合中的每对之间的距离</span></span><br><span class="line"><span class="string">input: </span></span><br><span class="line"><span class="string">XA: array_like mA个n维向量</span></span><br><span class="line"><span class="string">XB: array_like mB个n维向量</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">XA,XB默认会转化为float</span></span><br><span class="line"><span class="string">metric: 距离的度量方式, 可选择的有很多: 'cosine', 'hamming','euclidean'等</span></span><br><span class="line"><span class="string">**kwargs: dict, optional</span></span><br><span class="line"><span class="string">对于选择不同距离度量的可选参数。</span></span><br><span class="line"><span class="string">比如在Minkowski距离时, p作为可选参数, 可以直接输入, 默认为2</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Output:</span></span><br><span class="line"><span class="string">返回一个mA x mB的矩阵Y。</span></span><br><span class="line"><span class="string">对于矩阵的yij, 对应的为XA中第i个n维向量和XB中的第j个n维向量的距离度量。</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="comment"># 对于每个query，使用余弦相似度查询最接近的closest_n个句子</span></span><br><span class="line"></span><br><span class="line">closest_n=<span class="number">2</span></span><br><span class="line"><span class="keyword">for</span> query, query_embedding <span class="keyword">in</span> <span class="built_in">zip</span>(queries, query_embeddings):</span><br><span class="line">    distances=scipy.spatial.distance.cdist([query_embedding],corpus_embeddings,<span class="string">'cosine'</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="comment"># cdist返回一个1xlen(corpus)的matrix</span></span><br><span class="line">    <span class="comment"># distances: array len(corpus)</span></span><br><span class="line">    <span class="comment"># print(len(distances))</span></span><br><span class="line">    <span class="comment"># 按照距离逆序</span></span><br><span class="line">    results=<span class="built_in">zip</span>(<span class="built_in">range</span>(<span class="built_in">len</span>(distances)),distances)</span><br><span class="line">    <span class="comment"># results:[(index_1, distance_1),(index_2,distance_2)...]</span></span><br><span class="line">    results=<span class="built_in">sorted</span>(results,key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>]) <span class="comment"># 根据距离进行升序排列</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'='</span>*<span class="number">10</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">'Query:'</span>,query)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f'Result: top-<span class="subst">{closest_n}</span> most similar sentences in corpus:'</span>)</span><br><span class="line">    <span class="keyword">for</span> idx, distance <span class="keyword">in</span> results[<span class="number">0</span>:closest_n]:</span><br><span class="line">        <span class="comment"># 因为是cosine距离，所以这里相似度是1-distance</span></span><br><span class="line">        <span class="built_in">print</span>(corpus[idx].strip(),<span class="string">"(Score:%.4f)"</span>%(<span class="number">1</span>-distance))</span><br></pre></td></tr></table></figure>
+<p>总的来说还是较为简单的，huggingface已经给封装好了相关的库，只需要对输入和输出进行运算即可。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 采用自带的cos工具包完成</span></span><br><span class="line">cos_sim=util.cos_sim(embeddings, embeddings)</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">computes the cosine similarity cos_sim(a[i],b[j]).</span></span><br><span class="line"><span class="string">return Matrix with res[i][j]=cos_sim(a[i],b[j])</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">all_sentence_combinations=[]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(cos_sim)-<span class="number">1</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(i+<span class="number">1</span>, <span class="built_in">len</span>(cos_sim)):</span><br><span class="line">        all_sentence_combinations.append([cos_sim[i][j],i,j])</span><br><span class="line"><span class="comment"># sort</span></span><br><span class="line">all_sentence_combinations=<span class="built_in">sorted</span>(all_sentence_combinations, key=<span class="keyword">lambda</span> x:x[<span class="number">0</span>], reverse=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># print("top-5 most similar pairs:")</span></span><br><span class="line"><span class="keyword">for</span> score,i,j <span class="keyword">in</span> all_sentence_combinations[<span class="number">0</span>:<span class="number">5</span>]:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"{}\t{}\t{:.4f}"</span>.<span class="built_in">format</span>(sentences[i], sentences[j], cos_sim[i][j]))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="SBERT在中文STS数据集上微调"><a href="#SBERT在中文STS数据集上微调" class="headerlink" title="SBERT在中文STS数据集上微调"></a>SBERT在中文STS数据集上微调</h1><h2 id="中文STS数据集"><a href="#中文STS数据集" class="headerlink" title="中文STS数据集"></a>中文STS数据集</h2><p>采用的是网上开源的数据集，数据格式如下图所示</p>
+<p><img src="https://s2.loli.net/2022/03/14/JCG9a8vMXbe1BNP.png" alt=""></p>
+<p>是一个典型的STS任务。</p>
+<h2 id="微调代码"><a href="#微调代码" class="headerlink" title="微调代码"></a>微调代码</h2><p>相关包的导入</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="comment"># 数据加载</span></span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="keyword">from</span> sentence_transformers <span class="keyword">import</span> SentenceTransformer, LoggingHandler, losses,models, util</span><br><span class="line"><span class="comment"># losses内有很多的损失函数, util提供一些和文本嵌入相关的函数</span></span><br><span class="line"><span class="keyword">from</span> sentence_transformers.evaluation <span class="keyword">import</span> EmbeddingSimilarityEvaluator</span><br><span class="line"><span class="comment"># 计算与gold labels相比的Spearman和Pearson等级相关性。指标为余弦相似度以及欧式距离和曼哈顿距离。</span></span><br><span class="line"><span class="comment"># 返回的分数是与指定指标的Spearman相关性</span></span><br><span class="line"><span class="keyword">from</span> sentence_transformers.readers <span class="keyword">import</span> InputExample</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="comment"># 和LoggingHandler配合使用打印日志</span></span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br></pre></td></tr></table></figure>
+<p>模型参数的一些设置，这里有个画蛇添足的一点是，SBERT好像就默认使用本机的GPU了，不用再导入的时候指定GPU了。如果没有GPU，SBERT会使用cpu训练。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">model_name=<span class="string">'bert-base-chinese'</span></span><br><span class="line">train_batch_size=<span class="number">16</span></span><br><span class="line">num_epochs=<span class="number">4</span></span><br><span class="line">model_save_path=<span class="string">'test_output'</span></span><br><span class="line">logging.basicConfig(<span class="built_in">format</span>=<span class="string">'%(asctime)s-%(message)s'</span>,</span><br><span class="line">                    datefmt=<span class="string">'%Y-%m-%d %H:%M:%S'</span>,</span><br><span class="line">                    level=logging.INFO,</span><br><span class="line">                    handlers=[LoggingHandler()]</span><br><span class="line">)</span><br><span class="line">device=<span class="string">'cuda'</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">'cpu'</span></span><br><span class="line"><span class="built_in">print</span>(device)</span><br><span class="line"></span><br><span class="line">train_path=<span class="string">'./STSdata/train.csv'</span></span><br><span class="line">test_path=<span class="string">'./STSdata/test.csv'</span></span><br><span class="line">dev_path=<span class="string">'./STSdata/dev.csv'</span></span><br><span class="line">train_samples=[]</span><br><span class="line">dev_samples=[]</span><br><span class="line">test_samples=[]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>导入SBERT模型，设置模型的池化策略</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Use Huggingface/transformers model (like BERT, RoBERTa,</span></span><br><span class="line"><span class="comment">#  XLNet, XLM-R) for mapping tokens to embeddings</span></span><br><span class="line">word_embedding_model=models.Transformer(model_name)</span><br><span class="line"><span class="comment"># Apply mean pooling to get one fixed sized sentence vector</span></span><br><span class="line">pooling_model=models.Pooling(word_embedding_model.get_word_embedding_dimension(),</span><br><span class="line">                            pooling_mode_mean_tokens=<span class="literal">True</span>,</span><br><span class="line">                            pooling_mode_cls_token=<span class="literal">False</span>,</span><br><span class="line">                            pooling_mode_max_tokens=<span class="literal">False</span></span><br><span class="line">                            )</span><br><span class="line"></span><br><span class="line">model=SentenceTransformer(modules=[word_embedding_model, pooling_model])</span><br><span class="line"><span class="built_in">print</span>(model)</span><br></pre></td></tr></table></figure>
+<p>写load_data函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">load</span>(<span class="params">path</span>):</span><br><span class="line">    df=pd.read_csv(path)</span><br><span class="line">    samples=[]</span><br><span class="line">    <span class="keyword">for</span> idx, item <span class="keyword">in</span> df.iterrows():</span><br><span class="line">        samples.append(InputExample(texts=[item[<span class="string">'sentence1'</span>],item[<span class="string">'sentence2'</span>]], label=<span class="built_in">float</span>(item[<span class="string">'label'</span>])))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> samples</span><br><span class="line">train_samples=load(train_path)</span><br><span class="line">dev_samples=load(dev_path)</span><br><span class="line">test_samples=load(test_path)</span><br></pre></td></tr></table></figure>
+<p>使用Pytorch的DataLoader完成数据的分批次读取</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">train_dataloader=DataLoader(train_samples,shuffle=<span class="literal">True</span>,batch_size=train_batch_size)</span><br><span class="line">train_loss=losses.CosineSimilarityLoss(model=model)</span><br><span class="line">evaluator=EmbeddingSimilarityEvaluator.from_input_examples(dev_samples,name=<span class="string">'sts-dev'</span>)</span><br><span class="line"><span class="comment"># 10% of train data for warm-up</span></span><br><span class="line">warmup_steps=math.ceil(<span class="built_in">len</span>(train_dataloader)*num_epochs*<span class="number">0.1</span>)</span><br></pre></td></tr></table></figure>
+<p>训练模型(有一说一这个fit函数很复古啊)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># train the model</span></span><br><span class="line">model.fit(train_objectives=[(train_dataloader,train_loss)],</span><br><span class="line">        evaluator=evaluator,</span><br><span class="line">        epochs=num_epochs,</span><br><span class="line">        evaluation_steps=<span class="number">1000</span>,</span><br><span class="line">        warmup_steps=warmup_steps,</span><br><span class="line">        output_path=model_save_path</span><br><span class="line">        )</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>最后就是大功告成了。</p>
+<p>我在我的笔电3060上试了以下，效果还是不错的。</p>
+<p>就跑了一个epoch，大概是15min，相关性度量：Pearson为0.74，Spearman为0.72</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
+              <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
+              <a href="/tags/SBERT/" rel="tag"><i class="fa fa-tag"></i> SBERT</a>
+              <a href="/tags/Pytorch/" rel="tag"><i class="fa fa-tag"></i> Pytorch</a>
+              <a href="/tags/STS/" rel="tag"><i class="fa fa-tag"></i> STS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/cl6w9vemi00098gvn3mg28zcd/567779347581/" rel="prev" title="SBERT的训练图示">
+      <i class="fa fa-chevron-left"></i> SBERT的训练图示
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/cl6w9veml000i8gvn6lswg3cs/46e44d55ab16/" rel="next" title="简单的BM25代码实现">
+      简单的BM25代码实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SBERT-%E7%9B%B4%E6%8E%A5%E8%BF%9B%E8%A1%8Cmatch"><span class="nav-number">1.</span> <span class="nav-text">SBERT 直接进行match</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SBERT%E5%9C%A8%E4%B8%AD%E6%96%87STS%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B8%8A%E5%BE%AE%E8%B0%83"><span class="nav-number">2.</span> <span class="nav-text">SBERT在中文STS数据集上微调</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%87STS%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">2.1.</span> <span class="nav-text">中文STS数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AE%E8%B0%83%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">微调代码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ilingen"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">ilingen</p>
+  <div class="site-description" itemprop="description">A Rookie'blog in NLP&IR</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ilingen" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilingen" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:liulingen429@gmail.com" title="E-Mail → mailto:liulingen429@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://www.zhihu.com/people/liu-lin-gen-77" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;liu-lin-gen-77" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5247783364" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5247783364" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ilingen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+<script>
+    //   自定义邮箱审核规则
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('vsubmit')) {
+            const email = document.querySelector('input[type=email]');
+            const nick = document.querySelector('input[name=nick]');
+            const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+            if (!email.value || !nick.value || !reg.test(email.value)) {
+                const str = `<div class="valert text-center"><div class="vtext">请填写正确的昵称和邮箱！</div></div>`;
+                const vmark = document.querySelector('.vmark');
+                vmark.innerHTML = str;
+                vmark.style.display = 'block';
+                setTimeout(function() {
+                    vmark.style.display = 'none';
+                    vmark.innerHTML = '';
+                }, 2500);
+            }
+        }
+    })
+</script>
+
+<script>
+    // 点击回复直接评论,官方版本点击回复时都是跳回到页面上方的评论框进行回复，评论框是固定不动的
+    // 参考https://immmmm.com/valine-diy,用到jQuery
+    $(document).ready(function(){
+        //$('.vemoji-btn').text('😀');
+        $("#vcomments").on('click', 'span.vat',function(){
+            $(this).parent('div.vmeta').next("div.vcontent").after($("div.vwrap"));
+            $('textarea#veditor').focus();
+        })
+    })
+</script>
+<!-- 评论框美化 -->
+<style>
+    #comments .veditor{
+        min-height: 10rem;
+        background-image: url(https://gitee.com/wugenqiang/PictureBed/raw/master/CS-Notes/20200425091751.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: right;
+        background-color: rgba(255,255,255,0);
+        resize: none;}
+</style>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
