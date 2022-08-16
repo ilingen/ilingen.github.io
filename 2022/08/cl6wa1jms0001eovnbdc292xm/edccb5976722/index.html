@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilingen.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="因为项目和毕设的缘故，做了挺多关于Bert分类的实际操作的，本文主要记录下transformers库中使用较多的类。在本文中，你将看到  huggingface(hf)中Bert模型的简单介绍 BertConfig，BertTokenizer，BertModel的简单使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BERT微调使用">
+<meta property="og:url" content="https://ilingen.github.io/2022/08/cl6wa1jms0001eovnbdc292xm/edccb5976722/index.html">
+<meta property="og:site_name" content="ilingen">
+<meta property="og:description" content="因为项目和毕设的缘故，做了挺多关于Bert分类的实际操作的，本文主要记录下transformers库中使用较多的类。在本文中，你将看到  huggingface(hf)中Bert模型的简单介绍 BertConfig，BertTokenizer，BertModel的简单使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-01T15:40:39.000Z">
+<meta property="article:modified_time" content="2022-08-16T14:25:10.814Z">
+<meta property="article:author" content="ilingen">
+<meta property="article:tag" content="IR">
+<meta property="article:tag" content="DL">
+<meta property="article:tag" content="Pretrain">
+<meta property="article:tag" content="Bert">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://ilingen.github.io/2022/08/cl6wa1jms0001eovnbdc292xm/edccb5976722/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>BERT微调使用 | ilingen</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="ilingen" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ilingen</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">曾许人间第一流</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/08/cl6wa1jms0001eovnbdc292xm/edccb5976722/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="ilingen">
+      <meta itemprop="description" content="A Rookie'blog in NLP&IR">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ilingen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BERT微调使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-08-01 23:40:39" itemprop="dateCreated datePublished" datetime="2022-08-01T23:40:39+08:00">2022-08-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-16 22:25:10" itemprop="dateModified" datetime="2022-08-16T22:25:10+08:00">2022-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/" itemprop="url" rel="index"><span itemprop="name">工具使用</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>因为项目和毕设的缘故，做了挺多关于Bert分类的实际操作的，本文主要记录下transformers库中使用较多的类。<br>在本文中，你将看到</p>
+<ul>
+<li>huggingface(hf)中Bert模型的简单介绍</li>
+<li>BertConfig，BertTokenizer，BertModel的简单使用</li>
+</ul>
+<span id="more"></span>
+<p>Bert(Bidirectional Transformer for Language Understanding)通过MLM和NSP预训练任务，在Wikipedia和Toronto Book Corpus上进行自监督的学习。</p>
+<p>所谓的自监督：我理解的就是从无标签的数据中学习监督任务。比如MLM任务中，将随机mask掉一些token，然后predict出对应masked掉的token。</p>
+<p>Bert的预训练任务以及其encoder结构决定了其适合于NLU中的预测型的任务，不适合于text generation生成式任务，在工程实际使用中也需要注意这一点。</p>
+<p>Hugging face库中关于Bert的模型有很多，但是实际上需要掌握的用的最多的只有三个：BertConfig、BertTokenizer、BertModel。其他的封装好的下游任务API比如BertForSequenceClassification其实就是在原生的BertModel上外接Linear层实现的。</p>
+<h1 id="BertConfig配置"><a href="#BertConfig配置" class="headerlink" title="BertConfig配置"></a>BertConfig配置</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">transformers</span>.BertConfig(vocab_size = <span class="number">30522</span>, hidden_size = <span class="number">768</span>, </span><br><span class="line">                              num_hidden_layers = <span class="number">12</span>, num_attention_heads = <span class="number">12</span>,</span><br><span class="line">                              intermediate_size = <span class="number">3072</span>, hidden_act = <span class="string">&#x27;gelu&#x27;</span>,</span><br><span class="line">                              hidden_dropout_prob = <span class="number">0.1</span>,</span><br><span class="line">                              attention_probs_dropout_prob = <span class="number">0.1</span>,</span><br><span class="line">                              max_position_embeddings = <span class="number">512</span>, type_vocab_size = <span class="number">2</span>,</span><br><span class="line">                              initializer_range = <span class="number">0.02</span>, layer_norm_eps = <span class="number">1e-12</span>,</span><br><span class="line">                              pad_token_id = <span class="number">0</span>,position_embedding_type = <span class="string">&#x27;absolute&#x27;</span>,</span><br><span class="line">                              use_cache = <span class="literal">True</span>, classifier_dropout = <span class="literal">None</span>, **kwargs)</span><br></pre></td></tr></table></figure>
+<p>transformers中的一个类，用来记录<strong>BertModel</strong>的基本配置，继承自<strong>PretrainedConfig</strong>，用来初始化BERT模型，实例化bert-base-uncased模型。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> BertModel, BertConfig</span><br><span class="line"><span class="comment"># 默认使用bert-based-uncased初始化</span></span><br><span class="line">configuration=BertConfig()</span><br><span class="line"><span class="comment"># 初始化BertModel</span></span><br><span class="line">model=BertModel(configuration)</span><br><span class="line"><span class="comment"># 获取模型的配置</span></span><br><span class="line">configuration=model.config</span><br></pre></td></tr></table></figure><br>BertConfig继承自父类PretrainedConfig，因此可以调用父类的from_pretrained方法来直接加载模型配置。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加载bert-based-chinese</span></span><br><span class="line">configuration=BertConfig.from_pretrained(<span class="string">&quot;bert-based-chinese&quot;</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="BertTokenizer分词器"><a href="#BertTokenizer分词器" class="headerlink" title="BertTokenizer分词器"></a>BertTokenizer分词器</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">transformers</span>.BertTokenizer(vocab_file, do_lower_case=<span class="literal">True</span>,</span><br><span class="line">                                 do_basic_tokenize=<span class="literal">True</span>, never_split=<span class="literal">None</span>,</span><br><span class="line">                                 unk_token=<span class="string">&#x27;[UNK]&#x27;</span>, sep_token=<span class="string">&#x27;[SEP]&#x27;</span>,</span><br><span class="line">                                 pad_token=<span class="string">&#x27;[PAD]&#x27;</span>，cls_token=<span class="string">&#x27;[CLS]&#x27;</span>,</span><br><span class="line">                                 mask_token=<span class="string">&#x27;[MASK]&#x27;</span>,tokenize_chinese_chars=<span class="literal">True</span>,</span><br><span class="line">                                 strip_accents=<span class="literal">None</span>,**kwargs)</span><br></pre></td></tr></table></figure>
+<p>构建基于WordPiece分词方式的BERT分词器，并进行编码。继承自PretrainedTokenizer，PretrainedTokenizer具有很多功能，可以查看源代码。</p>
+<p>BertTokenizer进行编码有三种方式，直接使用tokenizer()、tokenizer.encode()以及tokenizer.encode_plus()<br>三个函数调用时的参数基本一致，主要有以下几个</p>
+<ul>
+<li>text, text_pair 代表输入的两个句子 str</li>
+<li>truncation 是否进行截断操作 bool</li>
+<li>padding 是否进行padding处理 bool</li>
+<li>return_tensors ‘pt’表示pytorch的tensor；’tf’表示tensorflow版本tensor；None表示返回list</li>
+</ul>
+<p>通过<strong>tokenizer.vocab</strong>查看BertTokenizer的词典，主要注意几个词对应的是’[PAD]’对应的id为0，’[UNK]’对应id为100，’[CLS]’对应id为101，’[SEP]’对应id为102，’[MASK]’对应id为103。<br>其中tokenizer()和tokenizer.encode_plus()返回结果一致，都返回所有的编码结果，而tokenizer.encode()则是简单的返回词对应的id序列，对于编码器输出的三个编码结果，对应的含义如下。</p>
+<ul>
+<li><p>input_ids 是Tokenizer对两个句子的token进行idx映射编码，将对应的句子映射为idx。比如在BERT这里输入的形式是 CLS sen1 SEP sen2 SEP</p>
+</li>
+<li><p>token_type_idx 是为了区分第一句话和第二句话的编码。0表示第一句话，1表示第二句话</p>
+</li>
+<li><p>attention_mask 是为了区分有多少token是有用的，因为Bert输入为固定长度512，所以不足512的需要进行补全操作。补全的部分对应的attention_mask为0</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> BertTokenizer</span><br><span class="line">tokenizer=BertTokenizer.from_pretrained(<span class="string">&quot;bert-base-chinese&quot;</span>)</span><br><span class="line"><span class="comment"># 编码的两个句子</span></span><br><span class="line">sens1=<span class="string">&quot;银行贷款允许未成年人吗&quot;</span></span><br><span class="line">sens2=<span class="string">&#x27;未成年人可以办理银行卡吗&#x27;</span></span><br><span class="line"><span class="comment"># 第一种编码</span></span><br><span class="line">tokenizer(text=sens1,text_pair=sens2)</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">&#123;<span class="string">&#x27;input_ids&#x27;</span>: [<span class="number">101</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">6587</span>, <span class="number">3621</span>, <span class="number">1038</span>, <span class="number">6387</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1408</span>, <span class="number">102</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1377</span>, <span class="number">809</span>, <span class="number">1215</span>, <span class="number">4415</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">1305</span>, <span class="number">1408</span>, <span class="number">102</span>], </span><br><span class="line"> <span class="string">&#x27;token_type_ids&#x27;</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>],</span><br><span class="line"> <span class="string">&#x27;attention_mask&#x27;</span>: [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二种tokenizer.encode_plus()</span></span><br><span class="line">tokenizer.encode_plut(text=sens1, text_pair=sens2)</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">&#123;<span class="string">&#x27;input_ids&#x27;</span>: [<span class="number">101</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">6587</span>, <span class="number">3621</span>, <span class="number">1038</span>, <span class="number">6387</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1408</span>, <span class="number">102</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1377</span>, <span class="number">809</span>, <span class="number">1215</span>, <span class="number">4415</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">1305</span>, <span class="number">1408</span>, <span class="number">102</span>], </span><br><span class="line"> <span class="string">&#x27;token_type_ids&#x27;</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], </span><br><span class="line"> <span class="string">&#x27;attention_mask&#x27;</span>: [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]&#125;</span><br><span class="line"><span class="comment"># 第三种tokenizer.encode()</span></span><br><span class="line">tokenizer.encode(text=sens1, text_pair=sens2)</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">[<span class="number">101</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">6587</span>, <span class="number">3621</span>, <span class="number">1038</span>, <span class="number">6387</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1408</span>, <span class="number">102</span>, <span class="number">3313</span>, <span class="number">2768</span>, <span class="number">2399</span>, <span class="number">782</span>, <span class="number">1377</span>, <span class="number">809</span>, <span class="number">1215</span>, <span class="number">4415</span>, <span class="number">7213</span>, <span class="number">6121</span>, <span class="number">1305</span>, <span class="number">1408</span>, <span class="number">102</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="BertModel"><a href="#BertModel" class="headerlink" title="BertModel"></a>BertModel</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 原始定义</span></span><br><span class="line">BertModel(config, add_pooling_layer=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<p>这里需要讨论一下BertModel的两个加载方式</p>
+<ul>
+<li>BertConfig加载，用来加载配置，但不加载模型权重，相当于加载一个空的Bert模型，用作预训练任务。</li>
+<li>.from_pretrained()方法加载。.from_pretrained()方法是来自于父类PreTrainedModel，用来加载模型权重，相当于加载一个与训练好的Bert模型，用作下游微调。<h3 id="Bert的输入"><a href="#Bert的输入" class="headerlink" title="Bert的输入"></a>Bert的输入</h3>BertModel也是nn.Module的子类，forward函数定义如下<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># BertModel.forward</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params"></span></span><br><span class="line"><span class="params">        self,</span></span><br><span class="line"><span class="params">        input_ids: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        attention_mask: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        token_type_ids: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        position_ids: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        head_mask: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        inputs_embeds: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        encoder_hidden_states: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        encoder_attention_mask: <span class="type">Optional</span>[torch.Tensor] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        past_key_values: <span class="type">Optional</span>[<span class="type">List</span>[torch.FloatTensor]] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        use_cache: <span class="type">Optional</span>[<span class="built_in">bool</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        output_attentions: <span class="type">Optional</span>[<span class="built_in">bool</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        output_hidden_states: <span class="type">Optional</span>[<span class="built_in">bool</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">        return_dict: <span class="type">Optional</span>[<span class="built_in">bool</span>] = <span class="literal">None</span>,</span></span><br><span class="line"><span class="params">    </span>) -&gt; <span class="type">Union</span>[<span class="type">Tuple</span>[torch.Tensor], BaseModelOutputWithPoolingAndCrossAttentions]:</span><br></pre></td></tr></table></figure>
+其中，重点介绍一些输入的参数</li>
+<li>input_ids (batch_size,sequence_length) 输入序列根据字典中的token转化id</li>
+<li>attention_mask (batch_size, sequence_legnth) optional，避免对padding的id进行attention操作。1表示没有经过padding，0表示经过padding操作。</li>
+<li>token_type_ids (batch_size,sequence_length) optional，表示两个输入的句子。0表示第一个句子，1表示第二个句子</li>
+<li>position_ids (batch_size,sequence_length) optional，对输入的token进行位置的表示，如果没有输入，则会是Bert中的绝对位置编码</li>
+<li>head_mask (num_heads,)或者(num_layers, num_heads) optional 对选定的attention head进行mask操作。</li>
+<li>return_dict bool optional 是否返回ModelOutput形式的dict或者只是一个元组的形式。</li>
+</ul>
+<p>根据forward函数，Bert模型的简单使用如下所示。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> BertModel</span><br><span class="line">model=BertModel.from_pretrained(<span class="string">&quot;bert-base-chinese&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> transformers <span class="keyword">import</span> BertTokenizer</span><br><span class="line">tokenizer=BertTokenizer.from_pretrained(<span class="string">&quot;bert-base-chinese&quot;</span>)</span><br><span class="line"></span><br><span class="line">sens1=<span class="string">&quot;银行贷款允许未成年人吗&quot;</span></span><br><span class="line">sens2=<span class="string">&quot;未成年人可以办理银行卡吗&quot;</span></span><br><span class="line">inputs=tokenizer(sens1, sens2, return_tensors=<span class="string">&#x27;pt&#x27;</span>)</span><br><span class="line">outputs=model(**inputs)</span><br></pre></td></tr></table></figure></p>
+<h2 id="Bert的输出"><a href="#Bert的输出" class="headerlink" title="Bert的输出"></a>Bert的输出</h2><p>对于outputs，在未定义其他输出的情况下，有两个tensor输出，用作简单输出。</p>
+<ul>
+<li><p>last_hidden_state Bert给每个输入的token的表示，shape为[batch_size, seq_len, hidden_size]</p>
+</li>
+<li><p>pooler_output  last_hidden_state的第一个[CLS]向量经过线性层之后的输出，用作分类输出，shape为[batch_size,hidden_size]</p>
+</li>
+</ul>
+<p>在定义其他输出结果时，Bert模型返回结果为transformers中<br>modeling_outputs.BaseModelOutputWithPoolingAndCrossAttention类的实例形式。</p>
+<ul>
+<li><p>last_hidden_state (batch_size, sequence_length, hidden_size)最后一层的输出</p>
+</li>
+<li><p>pooler_output （batch_size, hidden_size) 对最后一层第一个token对应的CLS输出进行线性层和Tanh激活函数后的输出结果，通常用于句子分类。</p>
+</li>
+<li><p>hidden_states (Tuple)，当BERT的输入的output_hidden_states为True时，输出一个元组：长度为13，第一个为embedding，后面十二个都为对应层的输出结果，形状都为(batch_size, sequence_length, hidden_size)每层输出的模型隐藏状态加上可选的初始嵌入输出。</p>
+</li>
+<li><p>attentions (Tuple)，当输入的output_attentions=True时，对每层attention矩阵的输出，形状是(batch_size,num_heads,sequence_length,sequence_length)。经过softmax得到的注意力权重，用于计算加权权重。</p>
+</li>
+<li><p>cross_attentions(Tuple) 当输入的output_attentions=True时，输出解码器的attention矩阵输出，形状同样是(batch_size,num_heads,sequence_length,sequence_length)。</p>
+</li>
+<li><p>past_key_value(Tuple(Tuple)) 暂时没搞懂这个是啥。当use_cache=True时，返回元组的的元组。每个元组有两个张量(batch_size,num_heads,sequence_length,embed_size_per_head)包含预先计算的隐藏状态（自注意力块中的键和值，以及交叉注意力块中的可选 config.is_encoder_decoder=True），可用于加速顺序解码（参见 past_key_values 输入）。</p>
+</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文主要总结了transformers库中有关Bert模型的一些简单操作，也算是趁着暑期项目和学业没有特别赶的时候填的坑吧，有一些不太清楚或者有问题的可以随时反馈，希望大家在讨论中一起学习进步。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://huggingface.co/docs/transformers/v4.21.0/en/model_doc/bert">transformer的BERT官方文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/IR/" rel="tag"><i class="fa fa-tag"></i> IR</a>
+              <a href="/tags/DL/" rel="tag"><i class="fa fa-tag"></i> DL</a>
+              <a href="/tags/Pretrain/" rel="tag"><i class="fa fa-tag"></i> Pretrain</a>
+              <a href="/tags/Bert/" rel="tag"><i class="fa fa-tag"></i> Bert</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/cl6wa1jn3000jeovnhpht2iic/46e44d55ab16/" rel="prev" title="简单的BM25代码实现">
+      <i class="fa fa-chevron-left"></i> 简单的BM25代码实现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/08/cl6wa1jmv0003eovn4802enuq/fcf1b7506df0/" rel="next" title="NLL Loss以及CE Loss总结使用">
+      NLL Loss以及CE Loss总结使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BertConfig%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">BertConfig配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BertTokenizer%E5%88%86%E8%AF%8D%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">BertTokenizer分词器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BertModel"><span class="nav-number">3.</span> <span class="nav-text">BertModel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bert%E7%9A%84%E8%BE%93%E5%85%A5"><span class="nav-number">3.0.1.</span> <span class="nav-text">Bert的输入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bert%E7%9A%84%E8%BE%93%E5%87%BA"><span class="nav-number">3.1.</span> <span class="nav-text">Bert的输出</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ilingen"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">ilingen</p>
+  <div class="site-description" itemprop="description">A Rookie'blog in NLP&IR</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ilingen" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilingen" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:liulingen429@gmail.com" title="E-Mail → mailto:liulingen429@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://www.zhihu.com/people/liu-lin-gen-77" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;liu-lin-gen-77" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5247783364" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5247783364" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ilingen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+<script>
+    //   自定义邮箱审核规则
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('vsubmit')) {
+            const email = document.querySelector('input[type=email]');
+            const nick = document.querySelector('input[name=nick]');
+            const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+            if (!email.value || !nick.value || !reg.test(email.value)) {
+                const str = `<div class="valert text-center"><div class="vtext">请填写正确的昵称和邮箱！</div></div>`;
+                const vmark = document.querySelector('.vmark');
+                vmark.innerHTML = str;
+                vmark.style.display = 'block';
+                setTimeout(function() {
+                    vmark.style.display = 'none';
+                    vmark.innerHTML = '';
+                }, 2500);
+            }
+        }
+    })
+</script>
+
+<script>
+    // 点击回复直接评论,官方版本点击回复时都是跳回到页面上方的评论框进行回复，评论框是固定不动的
+    // 参考https://immmmm.com/valine-diy,用到jQuery
+    $(document).ready(function(){
+        //$('.vemoji-btn').text('😀');
+        $("#vcomments").on('click', 'span.vat',function(){
+            $(this).parent('div.vmeta').next("div.vcontent").after($("div.vwrap"));
+            $('textarea#veditor').focus();
+        })
+    })
+</script>
+<!-- 评论框美化 -->
+<style>
+    #comments .veditor{
+        min-height: 10rem;
+        background-image: url(https://gitee.com/wugenqiang/PictureBed/raw/master/CS-Notes/20200425091751.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: right;
+        background-color: rgba(255,255,255,0);
+        resize: none;}
+</style>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

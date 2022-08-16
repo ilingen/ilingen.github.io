@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"ilingen.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="NLL Loss(Negative Log Likehood Loss, 负对数似然函数)以及CE Loss(Cross Entropy Loss, 交叉熵损失函数)是分类任务的常见损失函数，本篇博客主要简单总结以下常见的NLL Loss 和CE Loss以及Pytorch中的使用，主要内容如下  NLL Loss的介绍和使用 CE Loss的介绍和使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NLL Loss以及CE Loss总结使用">
+<meta property="og:url" content="https://ilingen.github.io/2022/08/cl6wa1jmv0003eovn4802enuq/fcf1b7506df0/index.html">
+<meta property="og:site_name" content="ilingen">
+<meta property="og:description" content="NLL Loss(Negative Log Likehood Loss, 负对数似然函数)以及CE Loss(Cross Entropy Loss, 交叉熵损失函数)是分类任务的常见损失函数，本篇博客主要简单总结以下常见的NLL Loss 和CE Loss以及Pytorch中的使用，主要内容如下  NLL Loss的介绍和使用 CE Loss的介绍和使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/07/24/2knhEVbFltz6y3Q.png">
+<meta property="og:image" content="https://s2.loli.net/2022/07/24/vIkutRYHNpWhyob.png">
+<meta property="article:published_time" content="2022-08-16T13:41:36.000Z">
+<meta property="article:modified_time" content="2022-08-16T14:20:09.614Z">
+<meta property="article:author" content="ilingen">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="Loss Function">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/07/24/2knhEVbFltz6y3Q.png">
+
+<link rel="canonical" href="https://ilingen.github.io/2022/08/cl6wa1jmv0003eovn4802enuq/fcf1b7506df0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NLL Loss以及CE Loss总结使用 | ilingen</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="ilingen" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ilingen</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">曾许人间第一流</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rss">
+
+    <a href="/atom.xml" rel="section"><i class="fa fa-rss fa-fw"></i>RSS</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ilingen.github.io/2022/08/cl6wa1jmv0003eovn4802enuq/fcf1b7506df0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="ilingen">
+      <meta itemprop="description" content="A Rookie'blog in NLP&IR">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ilingen">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NLL Loss以及CE Loss总结使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-08-16 21:41:36 / 修改时间：22:20:09" itemprop="dateCreated datePublished" datetime="2022-08-16T21:41:36+08:00">2022-08-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86/" itemprop="url" rel="index"><span itemprop="name">知识整理</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>NLL Loss(Negative Log Likehood Loss, 负对数似然函数)以及CE Loss(Cross Entropy Loss, 交叉熵损失函数)是分类任务的常见损失函数，本篇博客主要简单总结以下常见的NLL Loss 和CE Loss以及Pytorch中的使用，主要内容如下</p>
+<ul>
+<li>NLL Loss的介绍和使用</li>
+<li>CE Loss的介绍和使用</li>
+</ul>
+<span id="more"></span>
+<h1 id="NLL-Loss"><a href="#NLL-Loss" class="headerlink" title="NLL Loss"></a>NLL Loss</h1><h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><p>NLL Loss输入需要有两个tensor，一个为模型的输出predict，一个为真实标签ground truth label。<br>NLL Loss的计算方式如下</p>
+<script type="math/tex; mode=display">loss=-predict[label]</script><p>在实际中，模型输出predict为经过softmax+log的输出，label为一维的向量。在最终的loss上需要加上负号，因此叫做负对数似然函数。</p>
+<p>比如，predict为[[2,3,1],[3,7,9]]，而label为[1,2]，则NLLLoss为</p>
+<script type="math/tex; mode=display">-(3+9)=12</script><h2 id="PyTorch的使用"><a href="#PyTorch的使用" class="headerlink" title="PyTorch的使用"></a>PyTorch的使用</h2><p>PyTorch官网中NLL Loss的定义如下<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># NLLLoss文档定义</span></span><br><span class="line">Class torch.nn.NLLLoss(weight=<span class="literal">None</span>, size_average=<span class="literal">None</span>, ignore_index=-<span class="number">100</span>, reduce=<span class="literal">None</span>, reduction=<span class="string">'mean'</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure><br>计算输入的负对数似然损失，给定的input应该是每个类的对数似然。输入的形状为(batch, C)或者(batch,C,d1,d2…)，后者可以用作计算逐像素的NLL Loss。</p>
+<h3 id="定义Parameters"><a href="#定义Parameters" class="headerlink" title="定义Parameters"></a>定义Parameters</h3><ul>
+<li>weight (tensor, optional): 每个类的重新调整的参数，输入应该为大小为C的tensor</li>
+<li>size_average&amp;reduction: 已经被弃用</li>
+<li>ignore_index(int, optional): 对于序列的输入进行padding操作时的参数</li>
+<li>reduction(string, optional): ‘none’:不采用reduction操作,’sum’进行求和操作,’mean’根据weight进行求和操作</li>
+</ul>
+<p>针对输入的对数似然要求，可以在网络最后一层加个LogSoftmax层，而如果损失函数是Cross Entropy函数，不需要加额外的层。<br>输入的label(Target)应该为一个一维的tensor，tensor的每个值应该在[0,C-1]之间。<br>weight用作处理不均衡的数据。</p>
+<p>没有经过reduce操作的loss计算公式如下</p>
+<script type="math/tex; mode=display">L(x, y)=\{l_1,l_2,...,l_N\}^T,\ l_n=-w_{y_n}x_{n,y_n}, w_c=weight[c]·1\ \{c\neq ignore_index\}</script><p>x为input, y为target，w是weight，N为batch size。</p>
+<p>根据reduce的两种方式，L(x,y)计算如下，其中默认为mean</p>
+<script type="math/tex; mode=display">L(x,y)=
+\begin{cases}
+\sum_{n=1}^{N}\frac{1}{\sum_{n=1}^Nw_{y_n}}l_n& \text{if reduction='mean'}\\
+\sum_{n=1}^{N}l_n& \text{if reduction='sum'}
+\end{cases}</script><h3 id="Forward输入参数"><a href="#Forward输入参数" class="headerlink" title="Forward输入参数"></a>Forward输入参数</h3><ul>
+<li>input (N,C)或者(C): C是类别的数量</li>
+<li>Target(N)或者(): 每一个值应该在[0,C-1]之间，取整数</li>
+<li>Ouput: 如果reduction=’none’, 输出为(N)；其他情况为标量</li>
+</ul>
+<p>简单的使用实例如下<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">torch.manual_seed(<span class="number">2022</span>)</span><br><span class="line">logsofmax=nn.LogSoftmax(dim=<span class="number">1</span>)</span><br><span class="line">loss=nn.NLLLoss()</span><br><span class="line"><span class="built_in">input</span>=torch.randn(<span class="number">3</span>,<span class="number">5</span>)</span><br><span class="line"><span class="built_in">input</span>=logsofmax(<span class="built_in">input</span>)</span><br><span class="line">target=torch.tensor([<span class="number">1</span>,<span class="number">0</span>,<span class="number">4</span>])</span><br><span class="line"><span class="comment"># 不使用weight参数计算NLL Loss</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"No weighted Loss"</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">input</span>)</span><br><span class="line"><span class="built_in">print</span>(target)</span><br><span class="line">ouput=loss(<span class="built_in">input</span>, target)</span><br><span class="line"><span class="built_in">print</span>(ouput)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用weight参数计算NLL Loss</span></span><br><span class="line">weight=torch.tensor([<span class="number">2.0</span>,<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">1</span>])</span><br><span class="line">loss=nn.NLLLoss(weight=weight)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'\n\n\nWeighted Loss'</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">input</span>)</span><br><span class="line"><span class="built_in">print</span>(target)</span><br><span class="line">ouput=loss(<span class="built_in">input</span>, target)</span><br><span class="line"><span class="built_in">print</span>(ouput)</span><br></pre></td></tr></table></figure><br>输出结果为<br><img src="https://s2.loli.net/2022/07/24/2knhEVbFltz6y3Q.png" alt=""></p>
+<h1 id="CE-Loss"><a href="#CE-Loss" class="headerlink" title="CE Loss"></a>CE Loss</h1><h2 id="简单介绍-1"><a href="#简单介绍-1" class="headerlink" title="简单介绍"></a>简单介绍</h2><p>交叉熵用来判定实际结果和模型的输出结果之间的接近程度，常被用来做分类的损失函数。</p>
+<p>在训练模型时，实际结果ground-truth通常为one-hot形式，而模型输出结果为一维的tensor，但并不是一个概率值(因为不能保证最基本的相加为1)，只是对输入的数值进行简单的加权和非线性处理得到的，我们对其进行softmax操作，使每个数值都用来表示模型的预测概率分布，最终使用交叉熵用来概括两个概率分布之间的相似程度。</p>
+<script type="math/tex; mode=display">softmax(y_i)=y_i'=\frac{e^{y_i}}{\sum_{j=1}^ne^{y_i}}</script><p>交叉熵公式如下：其中概率分布p(x)为实际结果ground-truth，概率分布q(x)为模型的输出概率值。</p>
+<script type="math/tex; mode=display">H(p,q)=-\sum\limits_x(p(x)log(q(x))+(1-p(x))log(1-q(x)))</script><p>比如在实际的三分类结果中，实际结果为p=(1,0,0)，模型预测输出为q=(0.5,0.2,0.3)<br>那么对应的交叉熵损失函数为</p>
+<script type="math/tex; mode=display">H(q,p)=-(1log(0.5)+0log0.5+0log(0.2)+1log(0.8)+0log(0.3)+1log(0.7))</script><h2 id="PyTorch中的使用"><a href="#PyTorch中的使用" class="headerlink" title="PyTorch中的使用"></a>PyTorch中的使用</h2><p>PyTorch官网中CE Loss的定义如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.nn.CrossEntropyLoss(weight=<span class="literal">None</span>, size_average=<span class="literal">None</span>, ignore_index=-<span class="number">100</span>, reduce=<span class="literal">None</span>, reduction=<span class="string">'mean'</span>, label_smoothing=<span class="number">0.0</span>)</span><br></pre></td></tr></table></figure>
+<p>参数的含义和[[NLL Loss]]中的函数一致，这里需要注意的是，input输入为未经过归一化的网络输出值即可，CE Loss相当于LogSoftmax+NLLLoss。<br>与之对应的，输入x需要进行log+softmax操作，然后进行NLLLoss运算。</p>
+<script type="math/tex; mode=display">L(x, y)=\{l_1,l_2,...,l_N\}^T,\ l_n=-w_{y_n}log\frac{exp(x_{n,y_n})}{\sum_{c=0}^Cexp^(x_{n,c})}, w_c=weight[c]·1\ \{c\neq ignore_index\}</script><p>在实际中，没有指定weight时，不考虑加权计算。</p>
+<p>因此，对于单个的<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.357ex" xmlns="http://www.w3.org/2000/svg" width="1.822ex" height="1.927ex" role="img" focusable="false" viewBox="0 -694 805.3 851.8"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="msub"><g data-mml-node="mi"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mi" transform="translate(331,-150) scale(0.707)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></g></svg></mjx-container>，计算公式可以简化如下</p>
+<script type="math/tex; mode=display">l_n=-input[target]+log\sum_{c=0}^Cexp(input[c])</script><p>其forward时的输入输出结果如下</p>
+<ul>
+<li><p>input (N,C)或者(C): C是类别的数量，直接取网络的输出即可</p>
+</li>
+<li><p>Target(N)或者(): 每一个值应该在[0,C-1]之间，取整数</p>
+</li>
+<li><p>Ouput: 如果reduction=’none’, 输出为(N)；其他情况为标量</p>
+</li>
+</ul>
+<p>以下为简单的PyTorch使用验证并计算Cross Entropy Loss = log + softmax + NLL Loss</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">torch.manual_seed(<span class="number">2022</span>)</span><br><span class="line">logsofmax=nn.LogSoftmax(dim=<span class="number">1</span>)</span><br><span class="line">loss=nn.NLLLoss()</span><br><span class="line">loss1=nn.CrossEntropyLoss()</span><br><span class="line"><span class="comment"># 模型的输出结果</span></span><br><span class="line"><span class="built_in">input</span>=torch.randn(<span class="number">3</span>,<span class="number">5</span>)</span><br><span class="line"><span class="comment"># 输入的ground_truth标签</span></span><br><span class="line">target=torch.tensor([<span class="number">1</span>,<span class="number">0</span>,<span class="number">4</span>])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"CrossEntropy Loss"</span>)</span><br><span class="line"><span class="comment"># 计算CELoss</span></span><br><span class="line">ouput=loss1(<span class="built_in">input</span>, target)</span><br><span class="line"><span class="built_in">print</span>(ouput)</span><br><span class="line"><span class="built_in">input</span>=logsofmax(<span class="built_in">input</span>)</span><br><span class="line">target=torch.tensor([<span class="number">1</span>,<span class="number">0</span>,<span class="number">4</span>])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"NLL Loss"</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">input</span>)</span><br><span class="line"><span class="built_in">print</span>(target)</span><br><span class="line"><span class="comment"># 用NLL Loss得到CE Loss</span></span><br><span class="line">ouput=loss(<span class="built_in">input</span>, target)</span><br><span class="line"><span class="built_in">print</span>(ouput)</span><br></pre></td></tr></table></figure>
+<p><img src="https://s2.loli.net/2022/07/24/vIkutRYHNpWhyob.png" alt=""></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本篇博客主要总结介绍了分类任务中的NLL Loss和CE Loss以及其Pytorch的简单使用。如有错误，希望能够指出，大家一起学习进步。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html?highlight=nn%20cross#torch.nn.CrossEntropyLoss">CrossEntropyLoss — PyTorch 1.12 documentation</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/383044774">详解torch.nn.NLLLOSS - 知乎</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/PyTorch/" rel="tag"><i class="fa fa-tag"></i> PyTorch</a>
+              <a href="/tags/Loss-Function/" rel="tag"><i class="fa fa-tag"></i> Loss Function</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/08/cl6wa1jms0001eovnbdc292xm/edccb5976722/" rel="prev" title="BERT微调使用">
+      <i class="fa fa-chevron-left"></i> BERT微调使用
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NLL-Loss"><span class="nav-number">1.</span> <span class="nav-text">NLL Loss</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">简单介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PyTorch%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">PyTorch的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89Parameters"><span class="nav-number">1.2.1.</span> <span class="nav-text">定义Parameters</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Forward%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.2.</span> <span class="nav-text">Forward输入参数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CE-Loss"><span class="nav-number">2.</span> <span class="nav-text">CE Loss</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D-1"><span class="nav-number">2.1.</span> <span class="nav-text">简单介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PyTorch%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">PyTorch中的使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ilingen"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">ilingen</p>
+  <div class="site-description" itemprop="description">A Rookie'blog in NLP&IR</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ilingen" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ilingen" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:liulingen429@gmail.com" title="E-Mail → mailto:liulingen429@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://www.zhihu.com/people/liu-lin-gen-77" title="zhihu → http:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;liu-lin-gen-77" rel="noopener" target="_blank"><i class="fab fa-zhihu fa-fw"></i>zhihu</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5247783364" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5247783364" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ilingen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+<script>
+    //   自定义邮箱审核规则
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('vsubmit')) {
+            const email = document.querySelector('input[type=email]');
+            const nick = document.querySelector('input[name=nick]');
+            const reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+            if (!email.value || !nick.value || !reg.test(email.value)) {
+                const str = `<div class="valert text-center"><div class="vtext">请填写正确的昵称和邮箱！</div></div>`;
+                const vmark = document.querySelector('.vmark');
+                vmark.innerHTML = str;
+                vmark.style.display = 'block';
+                setTimeout(function() {
+                    vmark.style.display = 'none';
+                    vmark.innerHTML = '';
+                }, 2500);
+            }
+        }
+    })
+</script>
+
+<script>
+    // 点击回复直接评论,官方版本点击回复时都是跳回到页面上方的评论框进行回复，评论框是固定不动的
+    // 参考https://immmmm.com/valine-diy,用到jQuery
+    $(document).ready(function(){
+        //$('.vemoji-btn').text('😀');
+        $("#vcomments").on('click', 'span.vat',function(){
+            $(this).parent('div.vmeta').next("div.vcontent").after($("div.vwrap"));
+            $('textarea#veditor').focus();
+        })
+    })
+</script>
+<!-- 评论框美化 -->
+<style>
+    #comments .veditor{
+        min-height: 10rem;
+        background-image: url(https://gitee.com/wugenqiang/PictureBed/raw/master/CS-Notes/20200425091751.png);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: right;
+        background-color: rgba(255,255,255,0);
+        resize: none;}
+</style>
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
